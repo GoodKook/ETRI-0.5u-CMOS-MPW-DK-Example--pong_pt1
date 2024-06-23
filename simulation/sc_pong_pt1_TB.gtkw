@@ -1,0 +1,29 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Sat Jun 22 09:17:05 2024
+[*]
+[dumpfile] "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/Pong_pt1/simulation/sc_pong_pt1_TB.vcd"
+[dumpfile_mtime] "Sat Jun 22 09:16:11 2024"
+[dumpfile_size] 338495
+[savefile] "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/Pong_pt1/simulation/sc_pong_pt1_TB.gtkw"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-28.274712 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 214
+[signals_width] 118
+[sst_expanded] 1
+[sst_vpaned_height] 152
+@28
+SystemC.clk
+SystemC.reset
+SystemC.up
+SystemC.down
+@22
+SystemC.rgb12[11:0]
+@28
+SystemC.hsync
+@29
+SystemC.vsync
+[pattern_trace] 1
+[pattern_trace] 0

@@ -6,15 +6,15 @@
 TOP_MODULE   = pong_pt1
 
 VERILOG_SRCS = ../source/$(TOP_MODULE).v \
-			   ../source/pixel_gen.v \
-			   ../source/vga_controller.v
+			   ../source/pixel_gen.v
 SC_SRCS      = sc_main.cpp \
                sc_$(TOP_MODULE)_TB.cpp
 SC_TOP_H     = sc_$(TOP_MODULE)_TB.h
 
 VERILATOR    = verilator
 CFLAGS       = -std=c++17
-CFLAGS      += -g
+#CFLAGS      += -g
+CFLAGS      += -O3 -DVERILATION
 #CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
 VFLAGS       = -DENT_ENP_CONTROL

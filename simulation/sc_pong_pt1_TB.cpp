@@ -17,9 +17,9 @@ void sc_pong_pt1_TB::test_generator()
     up.write(0);
     down.write(0);
 
-    wait(clk_100MHz.posedge_event());
-    wait(clk_100MHz.posedge_event());
-    wait(clk_100MHz.posedge_event());
+    wait(clk.posedge_event());
+    wait(clk.posedge_event());
+    wait(clk.posedge_event());
 
     reset.write(0);
 
@@ -29,7 +29,7 @@ void sc_pong_pt1_TB::test_generator()
     while(!quit)
     {
         wait(hsync.posedge_event());
-
+        
         if (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -47,10 +47,13 @@ void sc_pong_pt1_TB::test_generator()
                     case SDLK_DOWN:
                         down.write(true);
                         break;
+                    case SDLK_r:
+                        goto EXIT;
+                        break;
                     default:
                         break;
                 }
-                SDL_FlushEvents(SDL_KEYDOWN, SDL_KEYUP);
+                //SDL_FlushEvents(SDL_KEYDOWN, SDL_KEYUP);
                 break;
             case SDL_KEYUP:
                 //std::cout << "Key released: " << SDL_GetKeyName(event.key.keysym.sym) << std::endl;
@@ -65,7 +68,7 @@ void sc_pong_pt1_TB::test_generator()
                     default:
                         break;
                 }
-                SDL_FlushEvents(SDL_KEYDOWN, SDL_KEYUP);
+                //SDL_FlushEvents(SDL_KEYDOWN, SDL_KEYUP);
                 break;
             default:
                 break;
@@ -73,6 +76,7 @@ void sc_pong_pt1_TB::test_generator()
         }
     }
 
+    EXIT:
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -81,47 +85,15 @@ void sc_pong_pt1_TB::test_generator()
 
 void sc_pong_pt1_TB::monitor()
 {
-    int x = 0, y = 0, skip_hsync = 0;
+    int x = 0, y = 0, nHSync = 0, nVSync = 0;
     uint32_t    _rgb;
     uint8_t     R, G, B;
     
     while(true)
     {
-        WAIT_FOR_VSYNC:
-        wait(clk_100MHz.posedge_event());
-        if (vsync.read())
+        wait(p_tick.posedge_event());
+        if (p_tick.read())
         {
-            while(vsync.read())    // Skip vsync
-                wait(clk_100MHz.posedge_event());
-        }
-        else
-            continue;
-
-        // Skip hsync
-        for (int i=0; i<10; i++)
-        {
-            while(true)
-            {
-                wait(clk_100MHz.posedge_event());
-                if (hsync.read())
-                {
-                    while(hsync.read())    // Skip hsync
-                        wait(clk_100MHz.posedge_event());
-                }
-                else
-                    continue;
-                break;
-            }
-        }
-
-        SKIP_36CLK:
-        for (int i=0; i<36; i++)
-            wait(clk_100MHz.posedge_event());
-
-        while(true)
-        {
-            wait(clk_100MHz.posedge_event());
-            wait(clk_100MHz.posedge_event());
             _rgb = rgb.read();
             R = (_rgb>>8) & 0x0F;
             G = (_rgb>>4) & 0x0F;
@@ -132,39 +104,20 @@ void sc_pong_pt1_TB::monitor()
 
             if (hsync.read())
             {
+                printf("nVSync[%d] nHSync[%d]\r", nVSync, nHSync++);
+                fflush(stdout);
+
                 x = 0;
                 y++;
-                while(hsync.read()) // Skip hsync
-                    wait(clk_100MHz.posedge_event());
 
                 if (vsync.read())
                 {
                     y = 0;
-                    x = 0;
+                    nHSync = 0;
+                    nVSync++;
                     SDL_RenderPresent(renderer);
-                    goto WAIT_FOR_VSYNC;
-                }
-                else
-                {
-                    x = 0;
-                    goto SKIP_36CLK;
                 }
             }
         }
     }
-
-    sc_time t(1, SC_NS);
-#ifdef CO_EMULATION
-    while(true)
-    {
-        wait(CLK.posedge_event());
-        if ((int)Dout_emu.read() != (int)Dout_n16.read())
-        {
-            cout    << "Error at "   << sc_time_stamp() << ": "
-                    << std::hex
-                    << "Dout=0x"     << Dout_n16.read() << " "
-                    << "Dout_emu=0x" << Dout_emu.read() << endl;
-        }
-    }
-#endif
 }

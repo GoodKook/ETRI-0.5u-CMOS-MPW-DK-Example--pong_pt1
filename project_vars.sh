@@ -1,6 +1,6 @@
 #!/bin/tcsh -f
 #------------------------------------------------------------
-# project variables for project ~/ETRI050_DesignKit/Ref_Design/pong_pt1
+# project variables for project ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1
 #------------------------------------------------------------
 
 # Flow options:
@@ -34,17 +34,17 @@
 
 # Placement command options:
 # -------------------------------------------
-set initial_density = 0.61
+# set initial_density =
 # set graywolf_options =
-set addspacers_options = "-stripe 8 225 PG"
+# set addspacers_options = "-stripe 8 225 PG"
 # set addspacers_power =
 
 # Router command options:
 # -------------------------------------------
-set route_show = 1
+# set route_show =
 # set route_layers =
 # set via_use =
-set via_stacks = none
+# set via_stacks =
 # set qrouter_options =
 # set qrouter_nocleanup =
 

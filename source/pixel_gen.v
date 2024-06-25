@@ -3,59 +3,74 @@
 
 `timescale 1ns / 1ps
 
-module pixel_gen(
+module pixel_gen
+#(  // Parameters for Playground
+    parameter TABLE_WIDTH       = 640/4,
+    parameter TABLE_HEIGHT      = 480/4,
+    parameter WALL_THICKNESS    = 8,
+    parameter PADDLE_HEIGHT     = TABLE_HEIGHT/4,
+    parameter PADDLE_VELOCITY   = 4,
+    parameter BALL_VELOCITY_POS = +2,
+    parameter BALL_VELOCITY_NEG = -2,
+    parameter X_BIT_WIDTH = 10,
+    parameter Y_BIT_WIDTH = 10
+)
+(   // Ports
     input clk,  
     input reset,    
     input up,
     input down,
     input video_on,
-    input [9:0] x,
-    input [9:0] y,
+    input [X_BIT_WIDTH-1:0] x,
+    input [Y_BIT_WIDTH-1:0] y,
     output reg [11:0] rgb
-    );
-    
+);
+// Yosys interprete $bits(integer) as 32-bits
+// Exact bit-width must be provided according to Table's width & height
+//    localparam X_BIT_WIDTH = 10;    //$bits(TABLE_WIDTH);
+//    localparam Y_BIT_WIDTH = 10;    //$bits(TABLE_HEIGHT);
+
     // maximum x, y values in display area
-    parameter X_MAX = 639;
-    parameter Y_MAX = 479;
-    
-    // create 60Hz refresh tick
+    localparam X_MAX = TABLE_WIDTH-1;
+    localparam Y_MAX = TABLE_HEIGHT-1;
+
+    // create refresh tick
     wire refresh_tick;
-    assign refresh_tick = ((y == 481) && (x == 0)) ? 1 : 0; // start of vsync(vertical retrace)
-    
+    assign refresh_tick = ((y == Y_BIT_WIDTH'(TABLE_HEIGHT+1)) && (x == 0)) ? 1 : 0; // start of vsync(vertical retrace)
+
     // WALL
     // wall boundaries
-    parameter X_WALL_L = 32;    
-    parameter X_WALL_R = 39;    // 8 pixels wide
+    localparam X_WALL_L = TABLE_WIDTH/20;    
+    localparam X_WALL_R = X_WALL_L + WALL_THICKNESS;
     
     // PADDLE
     // paddle horizontal boundaries
-    parameter X_PAD_L = 600;
-    parameter X_PAD_R = 603;    // 4 pixels wide
+    localparam X_PAD_L = TABLE_WIDTH - X_WALL_L;
+    localparam X_PAD_R = X_PAD_L + (WALL_THICKNESS/2);
     // paddle vertical boundary signals
-    wire [9:0] y_pad_t, y_pad_b;
-    parameter PAD_HEIGHT = 72;  // 72 pixels high
+    wire [Y_BIT_WIDTH-1:0] y_pad_t, y_pad_b;
+    localparam PAD_HEIGHT = PADDLE_HEIGHT;
     // register to track top boundary and buffer
-    reg [9:0] y_pad_reg, y_pad_next;
+    reg [Y_BIT_WIDTH-1:0] y_pad_reg, y_pad_next;
     // paddle moving velocity when a button is pressed
-    parameter PAD_VELOCITY = 6;     // change to speed up or slow down paddle movement
+    localparam PAD_VELOCITY = PADDLE_VELOCITY;     // change to speed up or slow down paddle movement
     
     // BALL
     // square rom boundaries
-    parameter BALL_SIZE = 8;
+    localparam BALL_SIZE = 8;
     // ball horizontal boundary signals
-    wire [9:0] x_ball_l, x_ball_r;
+    wire [X_BIT_WIDTH-1:0] x_ball_l, x_ball_r;
     // ball vertical boundary signals
-    wire [9:0] y_ball_t, y_ball_b;
+    wire [Y_BIT_WIDTH-1:0] y_ball_t, y_ball_b;
     // register to track top left position
-    reg [9:0] y_ball_reg, x_ball_reg;
+    reg [Y_BIT_WIDTH-1:0] y_ball_reg;
+    reg [X_BIT_WIDTH-1:0] x_ball_reg;
     // signals for register buffer
-    wire [9:0] y_ball_next, x_ball_next;
+    wire [Y_BIT_WIDTH-1:0] y_ball_next;
+    reg [X_BIT_WIDTH-1:0] x_ball_next;
     // registers to track ball speed and buffers
-    reg [9:0] x_delta_reg, x_delta_next;
-    reg [9:0] y_delta_reg, y_delta_next;
-    // positive or negative ball velocity
-    parameter BALL_VELOCITY_POS = 4;
-    parameter BALL_VELOCITY_NEG = -4;
+    reg [X_BIT_WIDTH-1:0] x_delta_reg, x_delta_next;
+    reg [Y_BIT_WIDTH-1:0] y_delta_reg, y_delta_next;
     // round ball from square image
     wire [2:0] rom_addr, rom_col;   // 3-bit rom address and rom column
     reg [7:0] rom_data;             // data at current rom address
@@ -67,8 +82,8 @@ module pixel_gen(
             y_pad_reg   <= 0;
             x_ball_reg  <= 0;
             y_ball_reg  <= 0;
-            x_delta_reg <= 10'h002;
-            y_delta_reg <= 10'h002;
+            x_delta_reg <= 2;
+            y_delta_reg <= 2;
         end
         else begin
             y_pad_reg   <= y_pad_next;
@@ -96,7 +111,7 @@ module pixel_gen(
     wire [11:0] wall_rgb, pad_rgb, ball_rgb, bg_rgb;
     
     // pixel within wall boundaries
-    assign wall_on = ((X_WALL_L <= x) && (x <= X_WALL_R)) ? 1 : 0;
+    assign wall_on = ((X_BIT_WIDTH'(X_WALL_L) <= x) && (x <= X_BIT_WIDTH'(X_WALL_R))) ? 1 : 0;
     
     // assign object colors
     assign wall_rgb = 12'hAAA;      // gray wall
@@ -106,18 +121,18 @@ module pixel_gen(
 
     // paddle 
     assign y_pad_t  = y_pad_reg;                             // paddle top position
-    assign y_pad_b  = y_pad_t + PAD_HEIGHT - 1;              // paddle bottom position
-    assign pad_on   = (X_PAD_L <= x) && (x <= X_PAD_R) &&     // pixel within paddle boundaries
-                        (y_pad_t <= y) && (y <= y_pad_b);
+    assign y_pad_b  = y_pad_t + Y_BIT_WIDTH'(PAD_HEIGHT) - 1;              // paddle bottom position
+    assign pad_on   = (X_BIT_WIDTH'(X_PAD_L) <= x) && (x <= X_BIT_WIDTH'(X_PAD_R)) &&     // pixel within paddle boundaries
+                      (y_pad_t <= y) && (y <= y_pad_b);
 
     // Paddle Control
     always @* begin
         y_pad_next = y_pad_reg;     // no move
         if(refresh_tick)
-            if(up & (y_pad_t > PAD_VELOCITY))
-                y_pad_next = y_pad_reg - PAD_VELOCITY;  // move up
-            else if(down & (y_pad_b < (Y_MAX - PAD_VELOCITY)))
-                y_pad_next = y_pad_reg + PAD_VELOCITY;  // move down
+            if(up & (y_pad_t > Y_BIT_WIDTH'(PAD_VELOCITY)))
+                y_pad_next = y_pad_reg - Y_BIT_WIDTH'(PAD_VELOCITY);  // move up
+            else if(down & (y_pad_b < Y_BIT_WIDTH'(Y_MAX - PAD_VELOCITY)))
+                y_pad_next = y_pad_reg + Y_BIT_WIDTH'(PAD_VELOCITY);  // move down
     end
     
     // rom data square boundaries
@@ -135,24 +150,37 @@ module pixel_gen(
     // pixel within round ball
     assign ball_on = sq_ball_on & rom_bit;      // within square boundaries AND rom data bit == 1
     // new ball position
-    assign x_ball_next = (refresh_tick) ? x_ball_reg + x_delta_reg : x_ball_reg;
     assign y_ball_next = (refresh_tick) ? y_ball_reg + y_delta_reg : y_ball_reg;
-    
+    //assign x_ball_next = (refresh_tick) ? x_ball_reg + x_delta_reg : x_ball_reg;
+    always @*
+    begin
+        x_ball_next = x_ball_reg;
+        if (refresh_tick)
+        begin
+            if ((x_ball_reg + x_delta_reg) > X_BIT_WIDTH'(TABLE_WIDTH))
+                x_ball_next = 0;
+            else
+                x_ball_next = x_ball_reg + x_delta_reg;
+        end
+    end
+
     // change ball direction after collision
     always @* begin
         x_delta_next = x_delta_reg;
         y_delta_next = y_delta_reg;
         if(y_ball_t < 1)                                            // collide with top
-            y_delta_next = BALL_VELOCITY_POS;                       // move down
-        else if(y_ball_b > Y_MAX)                                   // collide with bottom
-            y_delta_next = BALL_VELOCITY_NEG;                       // move up
-        else if(x_ball_l <= X_WALL_R)                               // collide with wall
-            x_delta_next = BALL_VELOCITY_POS;                       // move right
-        else if((X_PAD_L <= x_ball_r) && (x_ball_r <= X_PAD_R) &&
-                (y_pad_t <= y_ball_b) && (y_ball_t <= y_pad_b))     // collide with paddle
-            x_delta_next = BALL_VELOCITY_NEG;                       // move left
-    end                    
-    
+            y_delta_next = Y_BIT_WIDTH'(BALL_VELOCITY_POS);         //  move down
+        else if(y_ball_b > Y_BIT_WIDTH'(Y_MAX))                     // collide with bottom
+            y_delta_next = Y_BIT_WIDTH'(BALL_VELOCITY_NEG);         //  move up
+        else if(x_ball_l <= X_BIT_WIDTH'(X_WALL_R))                 // collide with wall
+            x_delta_next = X_BIT_WIDTH'(BALL_VELOCITY_POS);         //  move right
+        else if((X_BIT_WIDTH'(X_PAD_L) <= x_ball_r) &&
+                (x_ball_r <= X_BIT_WIDTH'(X_PAD_R)) &&
+                (y_pad_t <= y_ball_b) &&
+                (y_ball_t <= y_pad_b))                              // collide with paddle
+            x_delta_next = X_BIT_WIDTH'(BALL_VELOCITY_NEG);         //  move left
+    end
+
     // rgb multiplexing circuit
     always @*
         if(~video_on)

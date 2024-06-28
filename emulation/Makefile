@@ -11,13 +11,15 @@ TOP_MODULE   = pong_pt1
 SC_SRCS      = ../simulation/sc_main.cpp \
                ../simulation/sc_$(TOP_MODULE)_TB.cpp
 SC_TOP_H     = ../simulation/sc_$(TOP_MODULE)_TB.h \
-               ./pong_pt1.h
+               ./pong_pt1.h \
+               ./pong_pt1_SA.h
 
 #VERILATOR    = verilator
 CFLAGS       = -std=c++17
 CFLAGS      += -g -Wall
 CFLAGS      += -std=c++17
-CFLAGS      += -DCO_EMULATION
+#CFLAGS      += -DCO_EMULATION
+CFLAGS      += -DCO_EMULATION_SA
 #CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
 LDFLAGS     += -lsystemc

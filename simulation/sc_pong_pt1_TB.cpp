@@ -20,6 +20,7 @@ void sc_pong_pt1_TB::test_generator()
     wait(clk.posedge_event());
     wait(clk.posedge_event());
     wait(clk.posedge_event());
+    wait(clk.posedge_event());
 
     reset.write(0);
 
@@ -83,6 +84,44 @@ void sc_pong_pt1_TB::test_generator()
     sc_stop();
 }
 
+#ifdef CO_EMULATION_SA
+void sc_pong_pt1_TB::monitor_SA()
+{
+    int x = 0, y = 0, nHSync = 0, nVSync = 0;
+    uint8_t pixel = 0, R, G, B;
+    
+    while(true)
+    {
+        wait(hsync.posedge_event());
+        if (hsync.read())
+        {
+            for (int i=0; i<16; i++)
+            {
+                pixel = u_pong_pt1->rxPacket[i];
+
+                for (int j=0; j<8; j++)
+                {
+                    R = G = B = (pixel & (0x80 >> j))? 0xFF : 0x00;
+                    SDL_SetRenderDrawColor(renderer, R, G, B, SDL_ALPHA_OPAQUE);
+                    SDL_RenderDrawPoint(renderer, x++, y);
+                }
+            }
+            printf("nVSync[%d] nHSync[%d]\r", nVSync, nHSync++);
+            fflush(stdout);
+
+            x = 0;
+            y++;
+            if (y>=64)
+            {
+                y = 0;
+                nHSync = 0;
+                nVSync++;
+                SDL_RenderPresent(renderer);
+            }
+        }
+    }
+}
+#else
 void sc_pong_pt1_TB::monitor()
 {
     int x = 0, y = 0, nHSync = 0, nVSync = 0;
@@ -121,3 +160,4 @@ void sc_pong_pt1_TB::monitor()
         }
     }
 }
+#endif

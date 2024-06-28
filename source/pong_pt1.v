@@ -13,8 +13,8 @@ module pong_pt1(
 
     parameter TABLE_WIDTH   = 128;  //640/4;
     parameter TABLE_HEIGHT  = 64;   //480/4;
-    parameter SCREEN_WIDTH  = TABLE_WIDTH  + 10;
-    parameter SCREEN_HEIGHT = TABLE_HEIGHT + 10;
+    parameter SCREEN_WIDTH  = TABLE_WIDTH  + 5;
+    parameter SCREEN_HEIGHT = TABLE_HEIGHT + 5;
 
 // Yosys interprete $bits(integer) as 32-bits
 // Exact bit-width must be provided according to Table's width & height

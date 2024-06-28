@@ -15,6 +15,8 @@ Revision History: Jun. 1, 2024
 #include "Vpong_pt1.h"
 #elif defined(CO_EMULATION)
 #include "pong_pt1.h"
+#elif defined(CO_EMULATION_SA)
+#include "pong_pt1_SA.h"
 #else
 #error "DUT NOT defined"
 #endif
@@ -35,14 +37,18 @@ SC_MODULE(sc_pong_pt1_TB)
     // Verilated pong_pt1 or Foreign Verilog
     Vpong_pt1*              u_Vpong_pt1;
     sc_signal<uint32_t>     rgb;    // Verilator treats all Verilog's vector as <uint32_t>
-#elif defined(CO_EMULATION)
+#elif defined(CO_EMULATION) || defined(CO_EMULATION_SA)
     // Emulator pong_pt1
     pong_pt1*               u_pong_pt1;
     sc_signal<sc_uint<12> > rgb;
 #endif
 
     void test_generator();
+#ifdef CO_EMULATION_SA
+    void monitor_SA();
+#else
     void monitor();
+#endif
     
     sc_trace_file* fp;  // VCD file
     SDL_Window* window;
@@ -51,13 +57,17 @@ SC_MODULE(sc_pong_pt1_TB)
     SC_CTOR(sc_pong_pt1_TB) :   // Constructor
         clk("clk", 100, SC_NS, 0.5, 0.0, SC_NS, false)
     {
-
         SC_THREAD(test_generator);
         sensitive << hsync;
 
+#ifdef CO_EMULATION_SA
+        SC_THREAD(monitor_SA);
+        sensitive << hsync;
+#else
         SC_THREAD(monitor);
         sensitive << p_tick;
         //sensitive << clk;
+#endif
 
         ////////////////////////////////////////////////////////////////
         // SDL
@@ -95,7 +105,7 @@ SC_MODULE(sc_pong_pt1_TB)
         u_Vpong_pt1->hsync(hsync);
         u_Vpong_pt1->vsync(vsync);
         u_Vpong_pt1->rgb(rgb);
-#elif defined(CO_EMULATION)
+#elif defined(CO_EMULATION) || defined(CO_EMULATION_SA)
         u_pong_pt1 = new pong_pt1("u_pong_pt1");
         u_pong_pt1->clk(clk);
         u_pong_pt1->reset(reset);

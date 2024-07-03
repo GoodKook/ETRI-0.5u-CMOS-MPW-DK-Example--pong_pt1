@@ -8,7 +8,7 @@
 
 // Co-Emulation interface -------------------------------------------
 // Followings are DUT specific defs
-#define DELAY_MICROS    10
+#define DELAY_MICROS    1
 
 #define N_RX            1   // Number of byte to DUT's inputs
                             //  Bitmap must match with SystemC TB and Verilog wrapper
@@ -98,7 +98,9 @@ void Transact_HSync(uint8_t* LineBuff)
 
   while(true)
   {
+    delayMicroseconds(DELAY_MICROS);
     psce.DUT_Negedge_Clk();
+    delayMicroseconds(DELAY_MICROS);
     psce.DUT_Posedge_Clk();
 
     psce.DUT_Output();
@@ -142,7 +144,9 @@ void WaitForNegedge(const uint8_t sig)
 
   while(true)
   {
+    delayMicroseconds(DELAY_MICROS);
     psce.DUT_Negedge_Clk();
+    delayMicroseconds(DELAY_MICROS);
     psce.DUT_Posedge_Clk();
 
     psce.DUT_Output();
@@ -162,7 +166,9 @@ void WaitForHSync()
 
   while(true)
   {
+    delayMicroseconds(DELAY_MICROS);
     psce.DUT_Negedge_Clk();
+    delayMicroseconds(DELAY_MICROS);
     psce.DUT_Posedge_Clk();
 
     psce.DUT_Output();

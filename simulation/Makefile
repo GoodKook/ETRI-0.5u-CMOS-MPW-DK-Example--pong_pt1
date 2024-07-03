@@ -13,11 +13,11 @@ SC_TOP_H     = sc_$(TOP_MODULE)_TB.h
 
 VERILATOR    = verilator
 CFLAGS       = -std=c++17
-#CFLAGS      += -g
+CFLAGS      += -g
 CFLAGS      += -O3 -DVERILATION
 #CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
-VFLAGS       = -DENT_ENP_CONTROL
+#VFLAGS       = -DENT_ENP_CONTROL
 
 TARGET       = V$(TOP_MODULE)
 TARGET_DIR   = obj_dir

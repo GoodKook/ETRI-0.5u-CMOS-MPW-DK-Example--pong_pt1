@@ -140,7 +140,7 @@ SC_MODULE(pong_pt1)
         //--------------------------------------------------------------
         // Set-up serial port communicating Arduino DUE USB-UART
         //fd = open("/dev/ttyACM0", O_RDWR | O_NDELAY | O_NOCTTY);
-        fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
+        fd = open("/dev/ttyACM1", O_RDWR | O_NOCTTY);
         if (fd < 0)
         {
             perror("Error opening serial port");

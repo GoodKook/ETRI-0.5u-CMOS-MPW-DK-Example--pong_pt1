@@ -12,27 +12,27 @@
   <Part Number>: GW5A-LV25MG121NC1/I0
   <Device>: GW5A-25
   <Device Version>: A
-  <Created Time>:Thu Jun 27 22:53:59 2024
+  <Created Time>:Wed Jul  3 14:18:25 2024
 
 
 2. PnR Details
 
   Running placement:
-    Placement Phase 0: CPU time = 0h 0m 0.134s, Elapsed time = 0h 0m 0.139s
-    Placement Phase 1: CPU time = 0h 0m 0.456s, Elapsed time = 0h 0m 0.466s
-    Placement Phase 2: CPU time = 0h 0m 0.091s, Elapsed time = 0h 0m 0.09s
+    Placement Phase 0: CPU time = 0h 0m 0.154s, Elapsed time = 0h 0m 0.16s
+    Placement Phase 1: CPU time = 0h 0m 0.45s, Elapsed time = 0h 0m 0.46s
+    Placement Phase 2: CPU time = 0h 0m 0.09s, Elapsed time = 0h 0m 0.089s
     Placement Phase 3: CPU time = 0h 0m 1s, Elapsed time = 0h 0m 1s
     Total Placement: CPU time = 0h 0m 2s, Elapsed time = 0h 0m 2s
  Running routing:
     Routing Phase 0: CPU time = 0h 0m 0.001s, Elapsed time = 0h 0m 0.001s
-    Routing Phase 1: CPU time = 0h 0m 32s, Elapsed time = 0h 0m 32s
-    Routing Phase 2: CPU time = 0h 0m 0.094s, Elapsed time = 0h 0m 0.105s
+    Routing Phase 1: CPU time = 0h 0m 29s, Elapsed time = 0h 0m 28s
+    Routing Phase 2: CPU time = 0h 0m 0.069s, Elapsed time = 0h 0m 0.069s
     Routing Phase 3: CPU time = 0h 0m 0s, Elapsed time = 0h 0m 0s
-    Total Routing: CPU time = 0h 0m 32s, Elapsed time = 0h 0m 32s
+    Total Routing: CPU time = 0h 0m 29s, Elapsed time = 0h 0m 29s
  Generate output files:
     CPU time = 0h 0m 2s, Elapsed time = 0h 0m 2s
 
- Total Time and Memory Usage: CPU time = 0h 0m 36s, Elapsed time = 0h 0m 36s, Peak memory usage = 494MB
+ Total Time and Memory Usage: CPU time = 0h 0m 32s, Elapsed time = 0h 0m 32s, Peak memory usage = 499MB
 
 
 3. Resource Usage Summary
@@ -40,19 +40,19 @@
   ----------------------------------------------------------
   Resources                   | Usage
   ----------------------------------------------------------
-  Logic                       | 386/23040  2%
-    --LUT,ALU,ROM16           | 386(386 LUT, 0 ALU, 0 ROM16)
+  Logic                       | 416/23040  2%
+    --LUT,ALU,ROM16           | 416(416 LUT, 0 ALU, 0 ROM16)
     --SSRAM(RAM16)            | 0
-  Register                    | 68/23280  <1%
+  Register                    | 70/23280  <1%
     --Logic Register as Latch | 0/23040  0%
     --Logic Register as FF    | 59/23040  <1%
     --I/O Register as Latch   | 0/240  0%
-    --I/O Register as FF      | 9/240  4%
-  CLS                         | 214/11520  2%
-  I/O Port                    | 23
-  I/O Buf                     | 16
+    --I/O Register as FF      | 11/240  5%
+  CLS                         | 232/11520  3%
+  I/O Port                    | 27
+  I/O Buf                     | 20
     --Input Buf               | 8
-    --Output Buf              | 8
+    --Output Buf              | 12
     --Inout Buf               | 0
   IOLOGIC                     | 0%
   BSRAM                       | 0%
@@ -77,7 +77,7 @@
   -----------------------
   bank 0   | 0/6(0%)     
   bank 1   | 9/10(90%)   
-  bank 2   | 0/12(0%)    
+  bank 2   | 4/12(33%)   
   bank 3   | 0/4(0%)     
   bank 4   | 0/11(0%)    
   bank 5   | 0/13(0%)    
@@ -108,7 +108,7 @@
   Signal         | Global Clock   | Location
   -------------------------------------------
   clk_emu_IBUF_I_O| PRIMARY        |  TR TL
-  u_pong_pt1.clk | PRIMARY        |  TL
+  u_pong_pt1.clk | PRIMARY        |  TR TL
   ===========================================
 
 
@@ -140,6 +140,10 @@ clk_dut        |           | H5/1          | Y          | in    | IOT61[A] | LVC
 \Dout_emu[5]   |           | D10/6         | Y          | out   | IOL9[B]  | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
 \Dout_emu[6]   |           | G11/7         | Y          | out   | IOT7[A]  | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
 \Dout_emu[7]   |           | G10/7         | Y          | out   | IOT7[B]  | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
+p_tick_ex      |           | K2/2          | Y          | out   | IOR20[B] | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
+hsync_ex       |           | K1/2          | Y          | out   | IOR20[A] | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
+vsync_ex       |           | L1/2          | Y          | out   | IOR18[B] | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
+pixel_ex       |           | L2/2          | Y          | out   | IOR18[A] | LVCMOS33   | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3        | MEDIUM        | NONE         
 ======================================================================================================================================================================================================================
 
 
@@ -227,10 +231,10 @@ C1/10    | -              | in    | IOR1[A]  | LVCMOS33 | 8     | UP        | OF
 A3/10    | -              | in    | IOR1[B]  | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
 B1/10    | -              | in    | IOR3[A]  | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
 A2/10    | -              | out   | IOR3[B]  | LVCMOS33 | 8     | UP        | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
-L2/2     | -              | in    | IOR18[A] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
-L1/2     | -              | in    | IOR18[B] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
-K1/2     | -              | in    | IOR20[A] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
-K2/2     | -              | in    | IOR20[B] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
+L2/2     | pixel_ex       | out   | IOR18[A] | LVCMOS33 | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
+L1/2     | vsync_ex       | out   | IOR18[B] | LVCMOS33 | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
+K1/2     | hsync_ex       | out   | IOR20[A] | LVCMOS33 | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
+K2/2     | p_tick_ex      | out   | IOR20[B] | LVCMOS33 | 8     | NONE      | OFF       | OFF        | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
 J4/2     | -              | in    | IOR22[A] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
 K4/2     | -              | in    | IOR22[B] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         
 G2/2     | -              | in    | IOR24[A] | LVCMOS33 | 8     | UP        | OFF       | ON         | OFF        | OFF        | OFF             | OFF           | 3.3   | MEDIUM        | NONE         

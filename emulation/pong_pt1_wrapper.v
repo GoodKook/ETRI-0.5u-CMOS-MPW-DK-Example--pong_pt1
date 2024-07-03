@@ -6,15 +6,20 @@
 //
 
 `ifdef EMU_MONITOR_LED
-module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu, clk_dut, clk_LED);
+module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu, clk_dut, clk_LED,
+                        p_tick_ex, hsync_ex, vsync_ex, pixel_ex);
 `else
-module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu, clk_dut);
+module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu, clk_dut,
+                        p_tick_ex, hsync_ex, vsync_ex, pixel_ex);
 `endif
     input  [7:0]    Din_emu;
     output [7:0]    Dout_emu;
     input  [2:0]    Addr_emu;
     input           load_emu, get_emu, clk_emu;
     input           clk_dut;
+
+    output          p_tick_ex, hsync_ex, vsync_ex, pixel_ex;
+
 `ifdef EMU_MONITOR_LED
     output clk_LED;
     // Monitoring emulation process by blinking LED
@@ -69,6 +74,11 @@ module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu,
             Dout_emu <= vectOut[Addr_emu];  // output vector: DUT->Host
         end
     end
+
+    assign p_tick_ex = p_tick;
+    assign hsync_ex = hsync;
+    assign vsync_ex = vsync;
+    assign pixel_ex = rgb[9];
 
     // DUT --------------------------------------------------------------
     pong_pt1 u_pong_pt1 (

@@ -11,12 +11,14 @@ Revision History: Jun. 1, 2024
 
 #include <systemc.h>
 
-#if defined(VERILATION)
+#if defined(VERILATION)         // Cycle-Accurate Co-Simulation
 #include "Vpong_pt1.h"
-#elif defined(CO_EMULATION)
+#elif defined(CO_EMULATION)     // Cycle-Accurate Co-Emulation
 #include "pong_pt1.h"
-#elif defined(CO_EMULATION_SA)
+#elif defined(CO_EMULATION_SA)  // HSync Screen-Transacted Co-Emulation
 #include "pong_pt1_SA.h"
+#elif defined(CO_EMULATION_RT)  // No Screen-Transacted Co-Emulation
+#include "pong_pt1_RT.h"
 #else
 #error "DUT NOT defined"
 #endif
@@ -38,16 +40,20 @@ SC_MODULE(sc_pong_pt1_TB)
     Vpong_pt1*              u_Vpong_pt1;
     sc_signal<uint32_t>     rgb;    // Verilator treats all Verilog's vector as <uint32_t>
 #elif defined(CO_EMULATION) || defined(CO_EMULATION_SA)
-    // Emulator pong_pt1
     pong_pt1*               u_pong_pt1;
     sc_signal<sc_uint<12> > rgb;
+#elif defined(CO_EMULATION_RT)
+    pong_pt1*               u_pong_pt1;
 #endif
 
-    void test_generator();
-#ifdef CO_EMULATION_SA
-    void monitor_SA();
-#else
-    void monitor();
+    void test_generator();  // Keyboard event
+
+#if defined(VERILATION) || defined(CO_EMULATION)
+    void monitor();     // Cycle-Accurate Monitor Screen
+#elif defined(CO_EMULATION_SA)
+    void monitor_SA();  // HSync-Transacted Monitor Screen
+#elif defined(CO_EMULATION_RT)
+    // No Screen Transaction Monitor
 #endif
     
     sc_trace_file* fp;  // VCD file
@@ -60,13 +66,15 @@ SC_MODULE(sc_pong_pt1_TB)
         SC_THREAD(test_generator);
         sensitive << hsync;
 
-#ifdef CO_EMULATION_SA
-        SC_THREAD(monitor_SA);
-        sensitive << hsync;
-#else
-        SC_THREAD(monitor);
+#if defined(VERILATION) || defined(CO_EMULATION)
+        SC_THREAD(monitor);     // Cycle-Accurate Screen Monitor
         sensitive << p_tick;
         //sensitive << clk;
+#elif defined(CO_EMULATION_SA)
+        SC_THREAD(monitor_SA);  // HSync-Transacted Screen Monitor
+        sensitive << hsync;
+#elif defined(CO_EMULATION_RT)
+        // No Screen Transaction Monitor
 #endif
 
         ////////////////////////////////////////////////////////////////
@@ -105,7 +113,7 @@ SC_MODULE(sc_pong_pt1_TB)
         u_Vpong_pt1->hsync(hsync);
         u_Vpong_pt1->vsync(vsync);
         u_Vpong_pt1->rgb(rgb);
-#elif defined(CO_EMULATION) || defined(CO_EMULATION_SA)
+#elif defined(CO_EMULATION)
         u_pong_pt1 = new pong_pt1("u_pong_pt1");
         u_pong_pt1->clk(clk);
         u_pong_pt1->reset(reset);
@@ -115,6 +123,13 @@ SC_MODULE(sc_pong_pt1_TB)
         u_pong_pt1->hsync(hsync);
         u_pong_pt1->vsync(vsync);
         u_pong_pt1->rgb(rgb);
+#elif defined(CO_EMULATION_SA) || defined(CO_EMULATION_RT)
+        u_pong_pt1 = new pong_pt1("u_pong_pt1");
+        u_pong_pt1->clk(clk);
+        u_pong_pt1->reset(reset);
+        u_pong_pt1->up(up);
+        u_pong_pt1->down(down);
+        u_pong_pt1->hsync(hsync);
 #endif
 
 #ifdef VCD_TRACE

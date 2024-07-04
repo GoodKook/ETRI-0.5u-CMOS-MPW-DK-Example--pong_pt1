@@ -1,5 +1,8 @@
 `timescale 1ns / 1ps
 
+`define MAX_TABLE_WIDTH     640
+`define MAX_TABLE_HEIGHT    480
+
 module pong_pt1(
     input           clk,
     input           reset,
@@ -11,15 +14,28 @@ module pong_pt1(
     output [11:0]   rgb
     );
 
-    parameter TABLE_WIDTH   = 128;  //640/4;
-    parameter TABLE_HEIGHT  = 64;   //480/4;
+`ifdef MAX_TABLE_SIZE
+    parameter TABLE_WIDTH   = `MAX_TABLE_WIDTH;
+    parameter TABLE_HEIGHT  = `MAX_TABLE_HEIGHT;
+    parameter X_BIT_WIDTH   = $bits(TABLE_WIDTH);
+    parameter Y_BIT_WIDTH   = $bits(TABLE_HEIGHT);
+`elsif HALF_TABLE_SIZE
+    parameter TABLE_WIDTH   = `MAX_TABLE_WIDTH/2;
+    parameter TABLE_HEIGHT  = `MAX_TABLE_HEIGHT/2;
+    parameter X_BIT_WIDTH   = $bits(TABLE_WIDTH);
+    parameter Y_BIT_WIDTH   = $bits(TABLE_HEIGHT);
+`else
+    parameter TABLE_WIDTH   = 128;
+    parameter TABLE_HEIGHT  = 64;
+// Yosys interprete $bits(integer) as 32-bits
+// Exact bit-width must be provided according to Table's width & height
+    parameter X_BIT_WIDTH   = 9;
+    parameter Y_BIT_WIDTH   = 8;
+`endif    
+
     parameter SCREEN_WIDTH  = TABLE_WIDTH  + 5;
     parameter SCREEN_HEIGHT = TABLE_HEIGHT + 5;
 
-// Yosys interprete $bits(integer) as 32-bits
-// Exact bit-width must be provided according to Table's width & height
-    parameter X_BIT_WIDTH   = 9;   //$bits(TABLE_WIDTH);
-    parameter Y_BIT_WIDTH   = 8;   //$bits(TABLE_HEIGHT);
 
     wire                    vid_on;
     reg                     pixel_tick;

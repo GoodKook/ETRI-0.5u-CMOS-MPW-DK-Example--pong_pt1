@@ -5,8 +5,8 @@
 
 module pixel_gen
 #(  // Parameters for Playground
-    parameter TABLE_WIDTH       = 640/4,
-    parameter TABLE_HEIGHT      = 480/4,
+    parameter TABLE_WIDTH       = 640,
+    parameter TABLE_HEIGHT      = 480,
     parameter WALL_THICKNESS    = 8,
     parameter PADDLE_HEIGHT     = TABLE_HEIGHT/4,
     parameter PADDLE_VELOCITY   = 4,
@@ -25,10 +25,6 @@ module pixel_gen
     input [Y_BIT_WIDTH-1:0] y,
     output reg [11:0] rgb
 );
-// Yosys interprete $bits(integer) as 32-bits
-// Exact bit-width must be provided according to Table's width & height
-//    localparam X_BIT_WIDTH = 10;    //$bits(TABLE_WIDTH);
-//    localparam Y_BIT_WIDTH = 10;    //$bits(TABLE_HEIGHT);
 
     // maximum x, y values in display area
     localparam X_MAX = TABLE_WIDTH-1;

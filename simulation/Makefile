@@ -17,7 +17,8 @@ CFLAGS      += -g
 CFLAGS      += -O3 -DVERILATION
 #CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
-#VFLAGS       = -DENT_ENP_CONTROL
+VFLAGS       = -DHALF_TABLE_SIZE
+#VFLAGS       = -DMAX_TABLE_SIZE
 
 TARGET       = V$(TOP_MODULE)
 TARGET_DIR   = obj_dir
@@ -31,6 +32,7 @@ export CXX				= clang++
 export CXXFLAGS			= -std=c++17
 
 all :
+	@echo ''
 	@echo 'Makefile for "'$(TOP_MODULE)'" Co-Simulation: Verilog RTL(*) under SystemC Testbench[*]'
 	@echo ''
 	@echo '    make build'
@@ -47,6 +49,7 @@ all :
 	@echo ''
 	@echo '  (*) https://github.com/FPGADude/Digital-Design/tree/main/FPGA%20Projects/VGA%20Projects/Pong%20pt1'
 	@echo '  [*] Poorman`s Std. Co-Emulation(PSCE), GoodKook, goodkook@gmail.com'
+	@echo ''
 
 build : $(TARGET_DIR)/$(TARGET)
 

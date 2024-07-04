@@ -32,12 +32,17 @@ KS0108_GLCD display = KS0108_GLCD(22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33
 
 void setup()
 {
-  Serial.begin(9600);
+  pinMode(P_TICK_PIN, INPUT);
+  pinMode(HSYNC_PIN, INPUT);
+  pinMode(VSYNC_PIN, INPUT);
+  pinMode(PIXEL_PIN, INPUT);
+
+  //Serial.begin(9600);
 
   // initialize KS0108 GLCD module with active high CS pins
   if ( display.begin(KS0108_CS_ACTIVE_HIGH) == false )
   {
-    Serial.println( F("display initialization failed!") );    // lack of RAM space
+    //Serial.println( F("display initialization failed!") );    // lack of RAM space
     while(true);  // stay here forever!
   }
 
@@ -74,41 +79,84 @@ void setup()
   }
   display.display();
   }
-
-  // Show the display buffer on the screen. You MUST call display() after
-  // drawing commands to make them visible on screen!
-  display.display();
-  delay(2000);
 }
 
-// main loop (nothing here!)
+// MACROS --------------------------------------------------
+#define VSYNC_NEGEDGE   { \
+                          while ((PING & 0b00000010) != 0b00000010); \
+                          while ((PING & 0b00000010) == 0b00000010); \
+                        }
+#define P_TICK_POSEDGE  { \
+                          while ((PIND & 0b10000000) != 0b00000000); \
+                          while ((PIND & 0b10000000) != 0b10000000); \
+                        }
+#define HSYNC_NEGEDGE   { \
+                          while ((PING & 0b00000100) != 0b00000100); \
+                          while ((PING & 0b00000100) == 0b00000100); \
+                        }
+
 void loop()
 {
   int x=0, y=0;
+//  uint16_t  nColor;
+  uint8_t   FrameBuffer[16][64];
 
-  WaitForNegedge(VSYNC_PIN);
+  //WaitForNegedge(VSYNC_PIN);
+  VSYNC_NEGEDGE
 
   while(true)
   {
-    WaitForPosedge(P_TICK_PIN);
+    //WaitForPosedge(P_TICK_PIN);
+    //while ((PIND & 0b10000000) != 0b00000000);
+    //while ((PIND & 0b10000000) != 0b10000000);
+    P_TICK_POSEDGE
 
-    if(digitalRead(PIXEL_PIN))
-      display.drawPixel(x, y, KS0108_ON);
+//    if(digitalRead(PIXEL_PIN))
+//      display.drawPixel(x, y, KS0108_ON);
+//    else
+//      display.drawPixel(x, y, KS0108_OFF);
+
+    if ((PING & 0b00000001) == 0b00000001)  // PIXEL: Digital Pin #41 : Port G[0]
+      FrameBuffer[x/8][y] |= (FrameBuffer[x/8][y] |  (0b10000000 >> x%8));
+//      nColor = KS0108_ON;
     else
-      display.drawPixel(x, y, KS0108_OFF);
+      FrameBuffer[x/8][y] &= (FrameBuffer[x/8][y] | ~(0b10000000 >> x%8));
+//      nColor = KS0108_OFF;
+
+    //while ((PIND & 0b10000000) == 0b10000000);
+//    display.drawPixel(x, y, nColor);
 
     x++;
     if (x>=128)
     {
       x=0;
-      WaitForNegedge(HSYNC_PIN);
+      //WaitForNegedge(HSYNC_PIN);
+      HSYNC_NEGEDGE
 
       y++;
       if (y>=64)
       {
-        y=0;
+        for (int j=0, y=0; j<64; j++, y++)
+        {
+          for (int i=0, x=0; i<16; i++)
+          {
+            for (int k=0; k<8; k++)
+            {
+              if (FrameBuffer[i][j] & (0b10000000 >> k))
+                display.drawPixel(x, y, KS0108_ON);
+              else
+                display.drawPixel(x, y, KS0108_OFF);
+              x++;
+            }
+            FrameBuffer[i][j] = 0x00;
+          }
+        }
         display.display();
-        WaitForNegedge(VSYNC_PIN);
+
+        //WaitForNegedge(VSYNC_PIN);
+        VSYNC_NEGEDGE
+
+        y=x=0;
       }
     }
   }

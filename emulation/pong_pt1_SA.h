@@ -25,10 +25,7 @@ SC_MODULE(pong_pt1)
     sc_in<bool>             reset;
     sc_in<bool>             up;
     sc_in<bool>             down;
-    sc_out<bool>            p_tick;
-    sc_out<bool>            hsync;
-    sc_out<bool>            vsync;
-    sc_out<sc_uint<12> >    rgb;
+    sc_out<bool>            hsync;  // For keyboard event
 
     // Arduino Serial IF
     int fd;                 // Serial port file descriptor
@@ -37,50 +34,39 @@ SC_MODULE(pong_pt1)
 #define N_TX    1
 #define N_RX    16
 
-    uint8_t rxPacket[N_RX];
+    uint8_t rxPacket[N_RX], txPacket[N_TX];
 
-    void pong_pt1_TX_thread(void)
+    void pong_pt1_TX(void)
     {
-        uint8_t x, txPacket[N_TX];
+        uint8_t x;
 
-        while(true)
+        // Assemble bitmap for emulator input byte. Refer to Verilog wrapper
+        //  stimIn[0] = {----|clk|reset|up|down}
+        //txPacket[0] = (uint8_t)(reset.read()?   0x04:0x00) |
+        txPacket[0] = (uint8_t)(up.read()?      0x02:0x00) |
+                      (uint8_t)(down.read()?    0x01:0x00);
+
+        // Send to Emulator
+        for (int i=0; i<N_TX; i++)
         {
-            //-------------------------------------------------------
-            wait(clk.posedge_event());
-
-            // Assemble bitmap for emulator input byte. Refer to Verilog wrapper
-            //  stimIn[0] = {----|clk|reset|up|down}
-            //txPacket[0] = (uint8_t)(reset.read()?   0x04:0x00) |
-            txPacket[0] = (uint8_t)(up.read()?      0x02:0x00) |
-                          (uint8_t)(down.read()?    0x01:0x00);
-            //printf("TxPacket[0]=%02X\n", txPacket[0]);
-            //fflush(stdout);
-            // Send to Emulator
-            for (int i=0; i<N_TX; i++)
-            {
-                x = txPacket[i];
-                while(write(fd, &x, 1)<=0)
-                {
-                    wait(SC_ZERO_TIME);
-                    usleep(100);
-                }
-            }
+            x = txPacket[i];
+            while(write(fd, &x, 1)<=0)  usleep(10);
         }
     }
 
-    void pong_pt1_RX_thread(void)
+    void pong_pt1_RX(void)
     {
         uint8_t y;
         bool    bHSync = false;
-        
+
         while(true)
         {
             //-------------------------------------------------------
             wait(clk.posedge_event());
             if (bHSync)
             {
-                //printf("hSync....\n");
-                //fflush(stdout);
+            //    //printf("hSync....\n");
+            //    //fflush(stdout);
                 bHSync = false;
                 hsync.write(bHSync);
                 continue;
@@ -92,35 +78,32 @@ SC_MODULE(pong_pt1)
             {
                 while(read(fd, &y, 1)<=0)
                 {
-                    wait(SC_ZERO_TIME);
-                    usleep(100);
+                    //wait(SC_ZERO_TIME);
+                    usleep(10);
                 }
                 //printf("RxPacket[%d]=%02X\n", i, y);
                 //fflush(stdout);
                 rxPacket[i] = y;
             }
 
-            p_tick.write(false);
             bHSync = true;
             hsync.write(bHSync);
-            vsync.write(false);
-            rgb.write(0);
         }
     }
 
     sc_trace_file* fp;  // VCD file
 
     SC_CTOR(pong_pt1) :   // Constructor
-        clk("clk"), reset("reset"),
-        up("up"), down("down"),
-        p_tick("p_tick"),
-        hsync("hsync"), vsync("vsync"),
-        rgb("rgb")
+        clk("clk"),
+        reset("reset"),
+        up("up"),
+        down("down"),
+        hsync("hsync")
     {
-        SC_THREAD(pong_pt1_TX_thread);
-        sensitive << clk;
+        SC_METHOD(pong_pt1_TX);
+        sensitive << up << down;
 
-        SC_THREAD(pong_pt1_RX_thread);
+        SC_THREAD(pong_pt1_RX);
         sensitive << clk;
 
 #ifdef VCD_TRACE
@@ -131,16 +114,13 @@ SC_MODULE(pong_pt1)
         sc_trace(fp, reset, "reset");
         sc_trace(fp, up,    "up");
         sc_trace(fp, down,  "down");
-        sc_trace(fp, hsync, "p_tick");
         sc_trace(fp, hsync, "hsync");
-        sc_trace(fp, vsync, "vsync");
-        sc_trace(fp, rgb,   "rgb");
 #endif  // VCD_TRACE
 
         //--------------------------------------------------------------
         // Set-up serial port communicating Arduino DUE USB-UART
         //fd = open("/dev/ttyACM0", O_RDWR | O_NDELAY | O_NOCTTY);
-        fd = open("/dev/ttyACM1", O_RDWR | O_NOCTTY);
+        fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
         if (fd < 0)
         {
             perror("Error opening serial port");
@@ -164,7 +144,6 @@ SC_MODULE(pong_pt1)
             write(fd, &rx, 1);
         printf("Connection established...\n");
     }
-
 };
 
 #endif

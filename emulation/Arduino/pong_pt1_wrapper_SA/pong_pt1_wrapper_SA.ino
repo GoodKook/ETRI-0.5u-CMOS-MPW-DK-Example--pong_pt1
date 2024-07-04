@@ -56,16 +56,11 @@ void loop()
 
     Transact_HSync(LineBuff);
 
-    while(true)
+    for(int nTx=0; nTx<N_TX; nTx++)
     {
-      if (Serial.availableForWrite()>=N_TX)
-      {
-        for(int nTx=0; nTx<N_TX; nTx++)
-          Serial.write(LineBuff[nTx]);
-        break;
-      }
-      else
-        delayMicroseconds(10);
+      while (Serial.availableForWrite()<1)
+        delayMicroseconds(1);
+      Serial.write(LineBuff[nTx]);
     }
   }
 }
@@ -102,7 +97,7 @@ void Transact_HSync(uint8_t* LineBuff)
     psce.DUT_Negedge_Clk();
     delayMicroseconds(DELAY_MICROS);
     psce.DUT_Posedge_Clk();
-
+    
     psce.DUT_Output();
     Byte = (uint8_t)psce.EMU_Output(0);
 

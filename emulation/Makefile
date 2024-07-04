@@ -12,14 +12,15 @@ SC_SRCS      = ../simulation/sc_main.cpp \
                ../simulation/sc_$(TOP_MODULE)_TB.cpp
 SC_TOP_H     = ../simulation/sc_$(TOP_MODULE)_TB.h \
                ./pong_pt1.h \
-               ./pong_pt1_SA.h
+               ./pong_pt1_SA.h \
+			   ./pong_pt1_RT.h
 
 #VERILATOR    = verilator
 CFLAGS       = -std=c++17
 CFLAGS      += -g -Wall
-CFLAGS      += -std=c++17
 #CFLAGS      += -DCO_EMULATION
-CFLAGS      += -DCO_EMULATION_SA
+#CFLAGS      += -DCO_EMULATION_SA
+CFLAGS      += -DCO_EMULATION_RT
 #CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
 LDFLAGS     += -lsystemc
@@ -38,12 +39,14 @@ export CXX				= clang++
 export CXXFLAGS			= -std=c++17
 
 all :
+	@echo ''
 	@echo 'Makefile for "'$(TOP_MODULE)'" Co-Emulation: FPGA implemented Verilog RTL(*) under SystemC Testbench[*]'
 	@echo ''
 	@echo '    make build'
 	@echo '        Build executable of "'$(TOP_MODULE)'" with Verilated RTL and SystemC TB'
 	@echo '        1. Cycle-Accurate mode, compiled with -DCO_EMULATION'
 	@echo '        2. Tranaction-HSync mode, compiled with -DCO_EMULATION_SA'
+	@echo '        3. Tranaction-NONE mode, compiled with -DCO_EMULATION_RT'
 	@echo '        {*} Change compiler option by modifying variable CFLAGS in "Makefile"'
 	@echo ''
 	@echo '    make run'
@@ -57,6 +60,7 @@ all :
 	@echo ''
 	@echo '  (*) https://github.com/FPGADude/Digital-Design/tree/main/FPGA%20Projects/VGA%20Projects/Pong%20pt1'
 	@echo '  [*] Poorman`s Std. Co-Emulation(PSCE), GoodKook, goodkook@gmail.com'
+	@echo ''
 
 build : $(TARGET_DIR)/$(TARGET)
 

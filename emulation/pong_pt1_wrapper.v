@@ -56,12 +56,14 @@ module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu,
     begin
         if (load_emu)       // Set input stimulus to DUT
         begin
+            clk   <= stimIn[0][3];
             reset <= stimIn[0][2];
             up    <= stimIn[0][1];
             down  <= stimIn[0][0];
         end
         else if (get_emu)   // Capure output from DUT
         begin
+            vectOut[0][7]   <= 0;
             vectOut[0][6]   <= p_tick;
             vectOut[0][5]   <= hsync;
             vectOut[0][4]   <= vsync;

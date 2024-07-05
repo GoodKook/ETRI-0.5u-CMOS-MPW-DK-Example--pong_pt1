@@ -15,9 +15,9 @@ VERILATOR    = verilator
 CFLAGS       = -std=c++17
 CFLAGS      += -g
 CFLAGS      += -O3 -DVERILATION
-#CFLAGS      += -DVCD_TRACE
+CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
-VFLAGS       = -DHALF_TABLE_SIZE
+#VFLAGS       = -DHALF_TABLE_SIZE
 #VFLAGS       = -DMAX_TABLE_SIZE
 
 TARGET       = V$(TOP_MODULE)

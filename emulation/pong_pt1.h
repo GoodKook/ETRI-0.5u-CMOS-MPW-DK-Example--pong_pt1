@@ -66,7 +66,7 @@ SC_MODULE(pong_pt1)
             }
 
             // Dis-assemble emulator output byte to Verilog wrapper
-            // vectOut[0] = {--|hsync|vsync|rgb[11:8]}
+            // vectOut[0] = {-|p_tick|hsync|vsync|rgb[11:8]}
             // vectOut[1] = rgb[7:0]
             p_tick.write((rxPacket[0] & 0x40)? true:false);
             hsync.write((rxPacket[0]  & 0x20)? true:false);

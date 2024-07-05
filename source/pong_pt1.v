@@ -17,55 +17,68 @@ module pong_pt1(
 `ifdef MAX_TABLE_SIZE
     parameter TABLE_WIDTH   = `MAX_TABLE_WIDTH;
     parameter TABLE_HEIGHT  = `MAX_TABLE_HEIGHT;
-    parameter X_BIT_WIDTH   = $bits(TABLE_WIDTH);
-    parameter Y_BIT_WIDTH   = $bits(TABLE_HEIGHT);
+    `define MAX_HALF_TABLE_SIZE
 `elsif HALF_TABLE_SIZE
     parameter TABLE_WIDTH   = `MAX_TABLE_WIDTH/2;
     parameter TABLE_HEIGHT  = `MAX_TABLE_HEIGHT/2;
-    parameter X_BIT_WIDTH   = $bits(TABLE_WIDTH);
-    parameter Y_BIT_WIDTH   = $bits(TABLE_HEIGHT);
+    `define MAX_HALF_TABLE_SIZE
 `else
     parameter TABLE_WIDTH   = 128;
     parameter TABLE_HEIGHT  = 64;
-// Yosys interprete $bits(integer) as 32-bits
-// Exact bit-width must be provided according to Table's width & height
-    parameter X_BIT_WIDTH   = 9;
-    parameter Y_BIT_WIDTH   = 8;
 `endif    
 
-    parameter SCREEN_WIDTH  = TABLE_WIDTH  + 5;
-    parameter SCREEN_HEIGHT = TABLE_HEIGHT + 5;
+    parameter HPORCH = (TABLE_HEIGHT/8);
+    parameter VPORCH = (TABLE_HEIGHT/8);
+    parameter SCREEN_WIDTH  = TABLE_WIDTH  + (HPORCH*2);
+    parameter SCREEN_HEIGHT = TABLE_HEIGHT + (VPORCH*2);
 
+`ifdef MAX_HALF_TABLE_SIZE
+    // Table's Dimension
+    parameter TX_BIT_WIDTH   = $bits(TABLE_WIDTH);
+    parameter TY_BIT_WIDTH   = $bits(TABLE_HEIGHT);
+    // Screen's Dimension
+    parameter SX_BIT_WIDTH   = $bits(SCREEN_WIDTH);
+    parameter SY_BIT_WIDTH   = $bits(SCREEN_HEIGHT);
+`else
+// Yosys interprete $bits(integer) as 32-bits
+// Exact bit-width must be provided according to Table's width & height
+    parameter TX_BIT_WIDTH   = 9;
+    parameter TY_BIT_WIDTH   = 9;
+
+    parameter SX_BIT_WIDTH   = 9;
+    parameter SY_BIT_WIDTH   = 9;
+`endif
 
     wire                    vid_on;
+    wire                    p_tick_en;
     reg                     pixel_tick;
-    reg [X_BIT_WIDTH-1:0]   x;
-    reg [Y_BIT_WIDTH-1:0]   y;
+    reg [SX_BIT_WIDTH-1:0]   x;
+    reg [SY_BIT_WIDTH-1:0]   y;
 
     always @(posedge clk or posedge reset)
     begin
         if (reset)
             pixel_tick <= 0;
         else
-            pixel_tick <= ~p_tick;  // Toggle
+            pixel_tick <= ~p_tick_en;  // Toggle
     end
-    assign p_tick = pixel_tick;
+    assign p_tick_en = pixel_tick;
 
     always @(posedge clk or posedge reset)
     begin
         if (reset)
         begin
-            x <= 0;
-            y <= 0;
+            x <= TABLE_WIDTH;
+            y <= TABLE_HEIGHT;
         end
         else
         begin
-            if (p_tick)
+            if (p_tick_en)
             begin
-                if (x>=X_BIT_WIDTH'(SCREEN_WIDTH))
+                if (x>=SX_BIT_WIDTH'(SCREEN_WIDTH))
                 begin
                     x <= 0;
-                    if (y>=Y_BIT_WIDTH'(SCREEN_HEIGHT))
+                    if (y>=SY_BIT_WIDTH'(SCREEN_HEIGHT))
                        y <= 0;
                     else
                         y <= y + 1;
@@ -75,9 +88,10 @@ module pong_pt1(
             end
         end
     end
-    assign hsync  = (x==X_BIT_WIDTH'(SCREEN_WIDTH))?  1:0;
-    assign vsync  = (y==Y_BIT_WIDTH'(SCREEN_HEIGHT))? 1:0;
-    assign vid_on = (x<=X_BIT_WIDTH'(TABLE_WIDTH)) && (y<=Y_BIT_WIDTH'(TABLE_HEIGHT));
+    assign hsync  = (x>SX_BIT_WIDTH'(TABLE_WIDTH))  && (x<SX_BIT_WIDTH'(SCREEN_WIDTH-HPORCH)) && (y<SY_BIT_WIDTH'(TABLE_HEIGHT));
+    assign vsync  = (y>SY_BIT_WIDTH'(TABLE_HEIGHT)) && (y<SY_BIT_WIDTH'(TABLE_HEIGHT+VPORCH));
+    assign vid_on = (x<=SX_BIT_WIDTH'(TABLE_WIDTH))  && (y<=SY_BIT_WIDTH'(TABLE_HEIGHT));
+    assign p_tick = vid_on & pixel_tick;
 
     pixel_gen
         #(  .TABLE_WIDTH(TABLE_WIDTH),
@@ -87,8 +101,8 @@ module pong_pt1(
             .PADDLE_VELOCITY(1),
             .BALL_VELOCITY_POS(+1),
             .BALL_VELOCITY_NEG(-1),
-            .X_BIT_WIDTH(X_BIT_WIDTH),
-            .Y_BIT_WIDTH(Y_BIT_WIDTH)
+            .X_BIT_WIDTH(TX_BIT_WIDTH),
+            .Y_BIT_WIDTH(TY_BIT_WIDTH)
         )
         pg
         (   .clk(clk),

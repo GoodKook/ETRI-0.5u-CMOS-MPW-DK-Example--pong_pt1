@@ -17,6 +17,8 @@ Revision History: Jun. 1, 2024
 #include "pong_pt1.h"
 #elif defined(CO_EMULATION_SA)  // HSync Screen-Transacted Co-Emulation
 #include "pong_pt1_SA.h"
+#elif defined(CO_EMULATION_SA2) // VSync Screen-Transacted Co-Emulation
+#include "pong_pt1_SA2.h"
 #elif defined(CO_EMULATION_RT)  // No Screen-Transacted Co-Emulation
 #include "pong_pt1_RT.h"
 #else
@@ -39,10 +41,10 @@ SC_MODULE(sc_pong_pt1_TB)
     // Verilated pong_pt1 or Foreign Verilog
     Vpong_pt1*              u_Vpong_pt1;
     sc_signal<uint32_t>     rgb;    // Verilator treats all Verilog's vector as <uint32_t>
-#elif defined(CO_EMULATION) || defined(CO_EMULATION_SA)
+#elif defined(CO_EMULATION)
     pong_pt1*               u_pong_pt1;
     sc_signal<sc_uint<12> > rgb;
-#elif defined(CO_EMULATION_RT)
+#elif  defined(CO_EMULATION_SA) || defined(CO_EMULATION_SA2) || defined(CO_EMULATION_RT)
     pong_pt1*               u_pong_pt1;
 #endif
 
@@ -52,6 +54,8 @@ SC_MODULE(sc_pong_pt1_TB)
     void monitor();     // Cycle-Accurate Monitor Screen
 #elif defined(CO_EMULATION_SA)
     void monitor_SA();  // HSync-Transacted Monitor Screen
+#elif defined(CO_EMULATION_SA2)
+    void monitor_SA2();  // VSync-Transacted Monitor Screen
 #elif defined(CO_EMULATION_RT)
     // No Screen Transaction Monitor
 #endif
@@ -68,10 +72,12 @@ SC_MODULE(sc_pong_pt1_TB)
 
 #if defined(VERILATION) || defined(CO_EMULATION)
         SC_THREAD(monitor);     // Cycle-Accurate Screen Monitor
-        sensitive << p_tick;
-        //sensitive << clk;
+        sensitive << clk;
 #elif defined(CO_EMULATION_SA)
         SC_THREAD(monitor_SA);  // HSync-Transacted Screen Monitor
+        sensitive << hsync;
+#elif defined(CO_EMULATION_SA2)
+        SC_THREAD(monitor_SA2); // VSync-Transacted Screen Monitor
         sensitive << hsync;
 #elif defined(CO_EMULATION_RT)
         // No Screen Transaction Monitor
@@ -123,7 +129,7 @@ SC_MODULE(sc_pong_pt1_TB)
         u_pong_pt1->hsync(hsync);
         u_pong_pt1->vsync(vsync);
         u_pong_pt1->rgb(rgb);
-#elif defined(CO_EMULATION_SA) || defined(CO_EMULATION_RT)
+#elif defined(CO_EMULATION_SA) || defined(CO_EMULATION_SA2) || defined(CO_EMULATION_RT)
         u_pong_pt1 = new pong_pt1("u_pong_pt1");
         u_pong_pt1->clk(clk);
         u_pong_pt1->reset(reset);

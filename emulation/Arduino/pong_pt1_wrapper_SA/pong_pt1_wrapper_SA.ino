@@ -59,7 +59,7 @@ void loop()
     for(int nTx=0; nTx<N_TX; nTx++)
     {
       while (Serial.availableForWrite()<1)
-        delayMicroseconds(1);
+        delayMicroseconds(10);
       Serial.write(LineBuff[nTx]);
     }
   }
@@ -81,58 +81,28 @@ void Resetting()
 
 void Transact_HSync(uint8_t* LineBuff)
 {
-  static int y = 0;
-
   uint8_t Byte = 0x00;
   int x = 0;
-  bool p_tick0, p_tick1;
-  bool hsync0, hsync1;
 
   for (int i=0; i<N_TX; i++)
     LineBuff[i] = 0x00;
 
+  WaitForNegedge(HSYNC);
+
   while(true)
   {
-    delayMicroseconds(DELAY_MICROS);
-    psce.DUT_Negedge_Clk();
-    delayMicroseconds(DELAY_MICROS);
-    psce.DUT_Posedge_Clk();
-    
-    psce.DUT_Output();
-    Byte = (uint8_t)psce.EMU_Output(0);
+    Byte = WaitForPosedge(P_TICK);
 
-    if ((Byte&HSYNC) || (Byte&VSYNC))
-    {
-      x = 0;
-      continue;
-    }
+    if (Byte & PIXEL)
+      LineBuff[x/8] |= (0x80 >> (x%8));
 
-    p_tick1 = p_tick0;
-    p_tick0 = (Byte & P_TICK)? true:false;
-    if (p_tick0 && !p_tick1)  // Rising Edge of P_TICK
-    {
-      if (Byte & PIXEL)
-        LineBuff[x/8] |= (0x80 >> (x%8));
-
-      x++;
-      if ((x/8)>=N_TX)
-      {
-        WaitForNegedge(HSYNC);
-        y++;
-        if (y>=64)
-        {
-          WaitForNegedge(VSYNC);
-          y = 0;
-        }
-        return;
-      }
-    }
-    else
-      continue;
+    x++;
+    if ((x/8)>=N_TX)
+      return;
   }
 }
 
-void WaitForNegedge(const uint8_t sig)
+uint8_t WaitForNegedge(const uint8_t sig)
 {
   uint8_t Byte = 0x00;
   bool sig0, sig1;
@@ -150,14 +120,14 @@ void WaitForNegedge(const uint8_t sig)
     sig1 = sig0;
     sig0 = (Byte & sig)? true:false;
     if (!sig0 && sig1)  // Falling Edge
-      return;
+      return Byte;
   }
 }
 
-void WaitForHSync()
+uint8_t WaitForPosedge(const uint8_t sig)
 {
   uint8_t Byte = 0x00;
-  bool hsync0, hsync1;
+  bool sig0, sig1;
 
   while(true)
   {
@@ -169,9 +139,9 @@ void WaitForHSync()
     psce.DUT_Output();
     Byte = (uint8_t)psce.EMU_Output(0);
 
-    hsync1 = hsync0;
-    hsync0 = (Byte&HSYNC)? true:false;
-    if (!hsync0 && hsync1)  // Falling Edge of HSYNC
-      return;
+    sig1 = sig0;
+    sig0 = (Byte & sig)? true:false;
+    if (sig0 && !sig1)  // Rising Edge
+      return Byte;
   }
 }

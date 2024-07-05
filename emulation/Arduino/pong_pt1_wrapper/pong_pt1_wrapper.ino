@@ -11,13 +11,11 @@
 #define DELAY_MICROS    10
 
 #define N_RX            1   // Number of byte to DUT's inputs
-                            //  Bitmap must match with SystemC TB and Verilog wrapper
-                            //  ex) [0]={-|CLK|nCLR|nLOAD|Din_3|Din_2|Din_1|Din_0}
+                            //  stimIn[0] = {----|clk|reset|up|down}
 #define N_TX            2   // Number of byte from DUT's output
-                            //  Bitmap must match with SystemC TB and Verilog wrapper
-                            //  ex) [0]=Dout[ 7:0]
-                            //      [1]=Dout[15:8]
-                            //      [2]={-------|RCO}
+                            // vectOut[0] = {-|p_tick|hsync|vsync|rgb[11:8]}
+                            // vectOut[1] = rgb[7:0]
+
 #define DUT_CLK_BYTE    0
 #define DUT_CLK_BITMAP  0x00
 

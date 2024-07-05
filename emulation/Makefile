@@ -20,6 +20,7 @@ CFLAGS       = -std=c++17
 CFLAGS      += -g -Wall
 #CFLAGS      += -DCO_EMULATION
 #CFLAGS      += -DCO_EMULATION_SA
+#CFLAGS      += -DCO_EMULATION_SA2
 CFLAGS      += -DCO_EMULATION_RT
 #CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2

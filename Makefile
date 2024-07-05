@@ -5,8 +5,7 @@
 TOP_MODULE		=	pong_pt1
 
 VERILOG_SRCS	=	./source/$(TOP_MODULE).v \
-			   ./source/pixel_gen.v \
-			   ./source/vga_controller.v
+			   ./source/pixel_gen.v
 
 all :
 	@echo 'Makefile for "'$(TOP_MODULE)'" QFlow RTL-to-Layout using ETRI 0.5um CMOS Technology'

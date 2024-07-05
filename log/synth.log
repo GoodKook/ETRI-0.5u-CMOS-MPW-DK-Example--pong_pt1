@@ -1,3 +1,0 @@
-/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/source/pong_pt1.v:49: ERROR: Static cast is only supported in SystemVerilog mode.
-Errors detected in verilog source, need to be corrected.
-Synthesis flow stopped due to error condition.

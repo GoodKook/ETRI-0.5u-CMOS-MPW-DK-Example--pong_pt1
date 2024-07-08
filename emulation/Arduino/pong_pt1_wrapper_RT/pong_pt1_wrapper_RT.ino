@@ -8,7 +8,7 @@
 
 // Co-Emulation interface -------------------------------------------
 // Followings are DUT specific defs
-#define DELAY_MICROS    3
+#define DELAY_MICROS    5
 
 #define N_RX            1   // Number of byte to DUT's inputs
                             //  Bitmap must match with SystemC TB and Verilog wrapper
@@ -25,14 +25,14 @@ void setup()
 }
 
 //-----------------------------------------------------
-#define RESET_ON  0x04
-#define UP_BUTTON 0x02
-#define DN_BUTTON 0x01
+#define RESET_ON    0x08
+#define ENABLE_ON   0x04
+#define UP_BUTTON   0x02
+#define DN_BUTTON   0x01
 
 void loop()
 {
   int Rx;
-  uint8_t LineBuff[80]; // 640/8 = 80
 
   Resetting();
 

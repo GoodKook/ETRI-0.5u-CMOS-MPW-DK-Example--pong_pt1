@@ -13,12 +13,16 @@ SC_TOP_H     = sc_$(TOP_MODULE)_TB.h
 
 VERILATOR    = verilator
 CFLAGS       = -std=c++17
-CFLAGS      += -g
+CFLAGS      += -g -Wall  -Wfatal-errors
+# DUT type is VERILATION (RTL simulation)
 CFLAGS      += -O3 -DVERILATION
 CFLAGS      += -DVCD_TRACE
 LDFLAGS      = -lSDL2
+# Specify display type on Verilog RTL
 #VFLAGS       = -DHALF_TABLE_SIZE
 #VFLAGS       = -DMAX_TABLE_SIZE
+#VFLAGS       = -DVGAX_120x60
+VFLAGS       = -DGLCD_128x64
 
 TARGET       = V$(TOP_MODULE)
 TARGET_DIR   = obj_dir

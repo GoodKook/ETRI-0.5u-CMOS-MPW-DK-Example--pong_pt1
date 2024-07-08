@@ -6,6 +6,7 @@
 module pong_pt1(
     input           clk,
     input           reset,
+    input           enable,
     input           up,
     input           down,
     output          p_tick,
@@ -22,15 +23,16 @@ module pong_pt1(
     parameter TABLE_WIDTH   = `MAX_TABLE_WIDTH/2;
     parameter TABLE_HEIGHT  = `MAX_TABLE_HEIGHT/2;
     `define MAX_HALF_TABLE_SIZE
-`else
+`elsif VGAX_120x60
+    parameter TABLE_WIDTH   = 120;
+    parameter TABLE_HEIGHT  = 60;
+`elsif GLCD_128x64
     parameter TABLE_WIDTH   = 128;
     parameter TABLE_HEIGHT  = 64;
 `endif    
 
-    parameter HPORCH = (TABLE_HEIGHT/8);
-    parameter VPORCH = (TABLE_HEIGHT/8);
-    parameter SCREEN_WIDTH  = TABLE_WIDTH  + (HPORCH*2);
-    parameter SCREEN_HEIGHT = TABLE_HEIGHT + (VPORCH*2);
+    parameter SCREEN_WIDTH  = TABLE_WIDTH  + 2;
+    parameter SCREEN_HEIGHT = TABLE_HEIGHT + 1;
 
 `ifdef MAX_HALF_TABLE_SIZE
     // Table's Dimension
@@ -60,7 +62,10 @@ module pong_pt1(
         if (reset)
             pixel_tick <= 0;
         else
-            pixel_tick <= ~p_tick_en;  // Toggle
+            if (enable)
+                pixel_tick <= ~p_tick_en;  // Toggle
+            else
+                pixel_tick <= 0;
     end
     assign p_tick_en = pixel_tick;
 
@@ -88,10 +93,13 @@ module pong_pt1(
             end
         end
     end
-    assign hsync  = (x>SX_BIT_WIDTH'(TABLE_WIDTH))  && (x<SX_BIT_WIDTH'(SCREEN_WIDTH-HPORCH)) && (y<SY_BIT_WIDTH'(TABLE_HEIGHT));
-    assign vsync  = (y>SY_BIT_WIDTH'(TABLE_HEIGHT)) && (y<SY_BIT_WIDTH'(TABLE_HEIGHT+VPORCH));
-    assign vid_on = (x<=SX_BIT_WIDTH'(TABLE_WIDTH))  && (y<=SY_BIT_WIDTH'(TABLE_HEIGHT));
-    assign p_tick = vid_on & pixel_tick;
+    assign hsync  =    (x>SX_BIT_WIDTH'(TABLE_WIDTH))
+                    && (y<SY_BIT_WIDTH'(TABLE_HEIGHT))
+                    && (x<SX_BIT_WIDTH'(SCREEN_WIDTH));
+    assign vsync  =    (y>SY_BIT_WIDTH'(TABLE_HEIGHT-1));
+    assign vid_on =    (x<=SX_BIT_WIDTH'(TABLE_WIDTH))
+                    && (y<=SY_BIT_WIDTH'(TABLE_HEIGHT));
+    assign p_tick = vid_on & pixel_tick & (!vsync);
 
     pixel_gen
         #(  .TABLE_WIDTH(TABLE_WIDTH),

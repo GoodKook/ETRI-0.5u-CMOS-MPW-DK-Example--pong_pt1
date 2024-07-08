@@ -11,7 +11,7 @@
 #define DELAY_MICROS    10
 
 #define N_RX            1   // Number of byte to DUT's inputs
-                            //  stimIn[0] = {----|clk|reset|up|down}
+                            //  stimIn[0] = {---|clk|reset|enable|up|down}
 #define N_TX            2   // Number of byte from DUT's output
                             // vectOut[0] = {-|p_tick|hsync|vsync|rgb[11:8]}
                             // vectOut[1] = rgb[7:0]

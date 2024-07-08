@@ -1,7 +1,7 @@
-Reading netlist file: "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/impl/gwsynthesis/pong_pt1_wrapper.vg"
-Parsing netlist file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/impl/gwsynthesis/pong_pt1_wrapper.vg" completed
+Reading netlist file: "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/impl/gwsynthesis/pong_pt1_wrapper.vg"
+Parsing netlist file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/impl/gwsynthesis/pong_pt1_wrapper.vg" completed
 Processing netlist completed
-Reading constraint file: "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/src/psce_wrapper.cst"
+Reading constraint file: "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/src/psce_wrapper.cst"
 Physical Constraint parsed completed
 Running placement......
 [10%] Placement Phase 0 completed
@@ -18,9 +18,9 @@ Running timing analysis......
 Placement and routing completed
 Bitstream generation in progress......
 Bitstream generation completed
-Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.pin.html" completed
-Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.rpt.html" completed
-Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.rpt.txt" completed
-Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.tr.html" completed
-Fri Jul  5 12:29:46 2024
+Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.pin.html" completed
+Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.rpt.html" completed
+Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.rpt.txt" completed
+Generate file "/home/goodkook/ETRI050_DesignKit/devel/Ref_Design/pong_pt1.vga/emulation/Gowin/pong_pt1_wrapper/impl/pnr/pong_pt1_wrapper.tr.html" completed
+Mon Jul  8 13:28:48 2024
 

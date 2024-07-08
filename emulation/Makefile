@@ -17,12 +17,18 @@ SC_TOP_H     = ../simulation/sc_$(TOP_MODULE)_TB.h \
 
 #VERILATOR    = verilator
 CFLAGS       = -std=c++17
-CFLAGS      += -g -Wall
+CFLAGS      += -g -Wall -Wfatal-errors
 #CFLAGS      += -DCO_EMULATION
 #CFLAGS      += -DCO_EMULATION_SA
 #CFLAGS      += -DCO_EMULATION_SA2
 CFLAGS      += -DCO_EMULATION_RT
 #CFLAGS      += -DVCD_TRACE
+# For CO_EMULATION_SA, specify display device type
+#   1. VGAX:
+#CFLAGS      += -DVGAX_120x60
+#   2. GLCD:
+CFLAGS      += -DGLCD_128x64
+
 LDFLAGS      = -lSDL2
 LDFLAGS     += -lsystemc
 #TARGET       = V$(TOP_MODULE)
@@ -86,7 +92,8 @@ run : $(TARGET_DIR)/$(TARGET)
 	./$(TARGET_DIR)/$(TARGET)
 
 wave : sc_$(TOP_MODULE)_TB.vcd
-	gtkwave sc_$(TOP_MODULE)_TB.vcd --save=sc_$(TOP_MODULE)_TB.gtkw &
+	gtkwave sc_$(TOP_MODULE).vcd --save=sc_$(TOP_MODULE).gtkw &
+#	gtkwave sc_$(TOP_MODULE)_TB.vcd --save=sc_$(TOP_MODULE)_TB.gtkw &
 
 clean :
 	rm -f $(TARGET)

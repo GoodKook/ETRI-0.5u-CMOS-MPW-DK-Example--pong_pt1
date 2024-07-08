@@ -7,10 +7,10 @@
 
 `ifdef EMU_MONITOR_LED
 module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu, clk_dut, clk_LED,
-                        p_tick_ex, hsync_ex, vsync_ex, pixel_ex);
+                        p_tick_ex, hsync_ex, vsync_ex, pixel_ex, enable_ex);
 `else
 module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu, clk_dut,
-                        p_tick_ex, hsync_ex, vsync_ex, pixel_ex);
+                        p_tick_ex, hsync_ex, vsync_ex, pixel_ex, enable_ex);
 `endif
     input  [7:0]    Din_emu;
     output [7:0]    Dout_emu;
@@ -19,6 +19,7 @@ module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu,
     input           clk_dut;
 
     output          p_tick_ex, hsync_ex, vsync_ex, pixel_ex;
+    input           enable_ex;
 
 `ifdef EMU_MONITOR_LED
     output clk_LED;
@@ -39,6 +40,7 @@ module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu,
 
     // DUT interface: registered input
     reg clk;
+    reg enable;
     reg reset;          // btnR
     reg up;             // btnU
     reg down;           // btnD
@@ -49,17 +51,18 @@ module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu,
     wire [11:0] rgb;
 
     // Emulation Transactor ---------------------------------------------
-    //  stimIn[0] = {----|clk|reset|up|down}
+    //  stimIn[0] = {---|clk|reset|enable|up|down}
     // vectOut[0] = {-|p_tick|hsync|vsync|rgb[11:8]}
     // vectOut[1] = rgb[7:0]
     always @(posedge clk_emu)
     begin
         if (load_emu)       // Set input stimulus to DUT
         begin
-            clk   <= stimIn[0][3];
-            reset <= stimIn[0][2];
-            up    <= stimIn[0][1];
-            down  <= stimIn[0][0];
+            clk    <= stimIn[0][4];
+            reset  <= stimIn[0][3];
+            enable <= stimIn[0][2];
+            up     <= stimIn[0][1];
+            down   <= stimIn[0][0];
         end
         else if (get_emu)   // Capure output from DUT
         begin
@@ -86,6 +89,7 @@ module pong_pt1_wrapper(Din_emu, Dout_emu, Addr_emu, load_emu, get_emu, clk_emu,
     pong_pt1 u_pong_pt1 (
                 .clk(clk_dut),
                 .reset(reset),
+                .enable(enable | enable_ex),
                 .up(up),
                 .down(down),
                 .p_tick(p_tick),

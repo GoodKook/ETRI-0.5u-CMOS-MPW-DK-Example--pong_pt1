@@ -23,6 +23,7 @@ SC_MODULE(pong_pt1)
     // PORTS
     sc_in<bool>             clk;
     sc_in<bool>             reset;
+    sc_in<bool>             enable;
     sc_in<bool>             up;
     sc_in<bool>             down;
     sc_out<bool>            p_tick;
@@ -47,8 +48,9 @@ SC_MODULE(pong_pt1)
             //-------------------------------------------------------
             wait(clk.posedge_event());
             // Assemble bitmap for emulator input byte. Refer to Verilog wrapper
-            //  stimIn[0] = {----|clk|reset|up|down}
-            txPacket[0] = (uint8_t)(reset.read()?   0x04:0x00) |
+            //  stimIn[0] = {----|clk|reset|enable|up|down}
+            txPacket[0] = (uint8_t)(reset.read()?   0x08:0x00) |
+                          (uint8_t)(enable.read()?  0x04:0x00) |
                           (uint8_t)(up.read()?      0x02:0x00) |
                           (uint8_t)(down.read()?    0x01:0x00);
 
@@ -78,7 +80,15 @@ SC_MODULE(pong_pt1)
     sc_trace_file* fp;  // VCD file
 
     SC_CTOR(pong_pt1) :   // Constructor
-        clk("clk"), reset("reset"), up("up"), down("down"), p_tick("p_tick"), hsync("hsync"), vsync("vsync"), rgb("rgb")
+        clk("clk"),
+        reset("reset"),
+        enable("enable"),
+        up("up"),
+        down("down"),
+        p_tick("p_tick"),
+        hsync("hsync"),
+        vsync("vsync"),
+        rgb("rgb")
     {
         SC_THREAD(pong_pt1_thread);
         sensitive << clk;
@@ -89,9 +99,10 @@ SC_MODULE(pong_pt1)
         fp->set_time_unit(100, SC_PS);
         sc_trace(fp, clk,   "clk");
         sc_trace(fp, reset, "reset");
+        sc_trace(fp, enable,"enable");
         sc_trace(fp, up,    "up");
         sc_trace(fp, down,  "down");
-        sc_trace(fp, hsync, "p_tick");
+        sc_trace(fp, p_tick,"p_tick");
         sc_trace(fp, hsync, "hsync");
         sc_trace(fp, vsync, "vsync");
         sc_trace(fp, rgb,   "rgb");

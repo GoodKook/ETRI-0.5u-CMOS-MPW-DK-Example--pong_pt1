@@ -97,6 +97,8 @@ void sc_pong_pt1_TB::monitor()
     uint32_t    _rgb;
     uint8_t     R, G, B;
     
+    enable.write(true);
+
     while(true)
     {
         while (!vsync.read())   wait(clk.posedge_event());
@@ -131,7 +133,13 @@ void sc_pong_pt1_TB::monitor()
                 y++;
             }
             else if (vsync.read())
+            {
+                wait(3135, SC_NS);
+                enable.write(false);
+                wait(103073, SC_NS);   // Wait for Video refresh(Fake)
+                enable.write(true);
                 break;
+            }
         }
     }
 }
@@ -144,12 +152,14 @@ void sc_pong_pt1_TB::monitor_SA()
     int x = 0, y = 0, nHSync = 0, nVSync = 0;
     uint8_t pixel = 0, R, G, B;
     
+    enable.write(true);
+
     while(true)
     {
         wait(hsync.posedge_event());
         if (hsync.read())
         {
-            for (int i=0; i<16; i++)
+            for (int i=0; i<(TABLE_BWIDTH); i++)
             {
                 pixel = u_pong_pt1->rxPacket[i];
 
@@ -165,12 +175,17 @@ void sc_pong_pt1_TB::monitor_SA()
 
             x = 0;
             y++;
-            if (y>64)
+            if (y>TABLE_HEIGHT)
             {
-                y = 0;
+                y = 1;
                 nHSync = 0;
                 nVSync++;
+
+                //enable.write(false);
                 SDL_RenderPresent(renderer);
+
+                //wait(SC_ZERO_TIME);
+                //enable.write(true);
             }
         }
     }

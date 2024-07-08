@@ -5,7 +5,8 @@
 #   yosys pong_pt1_wrapper.ys | tee synthesis.log
 #
 read_verilog ../../../pong_pt1_wrapper.v
-read_verilog -sv ../../../../source/pong_pt1.v
+#read_verilog -sv -DVGAX_120x60 ../../../../source/pong_pt1.v
+read_verilog -sv -DGLCD_128x64 ../../../../source/pong_pt1.v
 read_verilog -sv ../../../../source/pixel_gen.v
 
 hierarchy -check -top pong_pt1_wrapper

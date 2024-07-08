@@ -23,6 +23,7 @@ SC_MODULE(pong_pt1)
     // PORTS
     sc_in<bool>             clk;
     sc_in<bool>             reset;
+    sc_in<bool>             enable;
     sc_in<bool>             up;
     sc_in<bool>             down;
     sc_out<bool>            hsync;  // For keyboard event
@@ -50,9 +51,10 @@ SC_MODULE(pong_pt1)
             }
 
             // Assemble bitmap for emulator input byte. Refer to Verilog wrapper
-            //  stimIn[0] = {----|clk|reset|up|down}
+            //  stimIn[0] = {----|clk|reset|enable|up|down}
             //txPacket[0] = (uint8_t)(reset.read()?   0x04:0x00) |
-            txPacket[0] = (uint8_t)(up.read()?      0x02:0x00) |
+            txPacket[0] = (uint8_t)(enable.read()?  0x04:0x00) |
+                          (uint8_t)(up.read()?      0x02:0x00) |
                           (uint8_t)(down.read()?    0x01:0x00);
 
             // Send to Emulator

@@ -8,12 +8,17 @@
 
 // Co-Emulation interface -------------------------------------------
 // Followings are DUT specific defs
+//#define TABLE_WIDTH   120 // VGAX 120x60
+#define TABLE_WIDTH   128 // GLCD 128x64
+#define TABLE_BWIDTH  (TABLE_WIDTH+7)/8
+
+//#define DELAY_MICROS    25  // VGAX
 #define DELAY_MICROS    1
 
 #define N_RX            1   // Number of byte to DUT's inputs
                             //  Bitmap must match with SystemC TB and Verilog wrapper
-                            //  stimIn[0] = {----|clk|reset|up|down}
-#define N_TX            16   // Number of byte from DUT's output (Burst out of 'LINE')
+                            //  stimIn[0] = {---|clk|reset|enable|up|down}
+#define N_TX            TABLE_BWIDTH   // Number of byte from DUT's output (Burst out of 'LINE')
 
 #define DUT_CLK_BYTE    0
 #define DUT_CLK_BITMAP  0x00
@@ -26,15 +31,18 @@ void setup()
 }
 
 //-----------------------------------------------------
-#define RESET_ON  0x04
+#define RESET_ON  0x08
+#define ENABLE_ON 0x04
 #define UP_BUTTON 0x02
 #define DN_BUTTON 0x01
 
+// vectOut[0] = {-|p_tick|hsync|vsync|rgb[11:8]}
+// vectOut[1] = rgb[7:0]
 #define P_TICK    0x40
 #define HSYNC     0x20
 #define VSYNC     0x10
-
-#define PIXEL     0x02
+// Use rgb[9] as 1-color pixel data
+#define PIXEL     0x02 
 
 void loop()
 {
@@ -87,22 +95,25 @@ void Transact_HSync(uint8_t* LineBuff)
   for (int i=0; i<N_TX; i++)
     LineBuff[i] = 0x00;
 
-  WaitForNegedge(HSYNC);
+  //WaitForNegedge(HSYNC);
 
   while(true)
   {
-    Byte = WaitForPosedge(P_TICK);
+    Byte = WaitPosedge_P_TICK();
+    if (Byte & HSYNC)
+    {
+      WaitForNegedge(HSYNC);
+      return;
+    }
 
     if (Byte & PIXEL)
       LineBuff[x/8] |= (0x80 >> (x%8));
 
     x++;
-    if ((x/8)>=N_TX)
-      return;
   }
 }
 
-uint8_t WaitForNegedge(const uint8_t sig)
+uint8_t WaitPosedge_P_TICK()
 {
   uint8_t Byte = 0x00;
   bool sig0, sig1;
@@ -117,10 +128,13 @@ uint8_t WaitForNegedge(const uint8_t sig)
     psce.DUT_Output();
     Byte = (uint8_t)psce.EMU_Output(0);
 
+    if (Byte & HSYNC)
+      return Byte;  // Return if HSYNC
+
     sig1 = sig0;
-    sig0 = (Byte & sig)? true:false;
-    if (!sig0 && sig1)  // Falling Edge
-      return Byte;
+    sig0 = (Byte & P_TICK)? true:false;
+    if (sig0 && !sig1)
+      return Byte;  // Return when Rising Edge of P_TICK
   }
 }
 
@@ -142,6 +156,28 @@ uint8_t WaitForPosedge(const uint8_t sig)
     sig1 = sig0;
     sig0 = (Byte & sig)? true:false;
     if (sig0 && !sig1)  // Rising Edge
+      return Byte;
+  }
+}
+
+uint8_t WaitForNegedge(const uint8_t sig)
+{
+  uint8_t Byte = 0x00;
+  bool sig0, sig1;
+
+  while(true)
+  {
+    delayMicroseconds(DELAY_MICROS);
+    psce.DUT_Negedge_Clk();
+    delayMicroseconds(DELAY_MICROS);
+    psce.DUT_Posedge_Clk();
+
+    psce.DUT_Output();
+    Byte = (uint8_t)psce.EMU_Output(0);
+
+    sig1 = sig0;
+    sig0 = (Byte & sig)? true:false;
+    if (!sig0 && sig1)  // Falling Edge
       return Byte;
   }
 }

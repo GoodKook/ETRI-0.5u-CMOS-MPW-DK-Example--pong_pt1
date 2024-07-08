@@ -10,8 +10,8 @@
 # /usr/local/share/qflow/scripts/vesta.sh  -d ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
 # /usr/local/share/qflow/scripts/magic_db.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
 # /usr/local/share/qflow/scripts/magic_drc.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
-# /usr/local/share/qflow/scripts/netgen_lvs.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
+/usr/local/share/qflow/scripts/netgen_lvs.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
 # /usr/local/share/qflow/scripts/magic_gds.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
 # /usr/local/share/qflow/scripts/cleanup.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
-/usr/local/share/qflow/scripts/cleanup.sh -p ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
+# /usr/local/share/qflow/scripts/cleanup.sh -p ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1
 # /usr/local/share/qflow/scripts/magic_view.sh ~/ETRI050_DesignKit/devel/Ref_Design/pong_pt1 pong_pt1 || exit 1

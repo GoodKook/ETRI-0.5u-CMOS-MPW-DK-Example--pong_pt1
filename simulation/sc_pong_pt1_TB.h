@@ -22,7 +22,7 @@ Revision History: Jun. 1, 2024
 #elif defined(CO_EMULATION_RT)  // No Screen-Transacted Co-Emulation
 #include "pong_pt1_RT.h"
 #else
-#error "DUT NOT defined"
+#error "DUT NOT defined. See 'Makefile'"
 #endif
 
 #include <SDL2/SDL.h>
@@ -31,6 +31,7 @@ SC_MODULE(sc_pong_pt1_TB)
 {
     sc_clock            clk;
     sc_signal<bool>     reset;
+    sc_signal<bool>     enable;
     sc_signal<bool>     up;
     sc_signal<bool>     down;
     sc_signal<bool>     p_tick;
@@ -69,6 +70,12 @@ SC_MODULE(sc_pong_pt1_TB)
     {
         SC_THREAD(test_generator);
         sensitive << hsync;
+
+#if  defined(CO_EMULATION_SA) || defined(CO_EMULATION_SA2) || defined(CO_EMULATION_RT)
+        enable.write(false);
+#else
+        enable.write(true);
+#endif
 
 #if defined(VERILATION) || defined(CO_EMULATION)
         SC_THREAD(monitor);     // Cycle-Accurate Screen Monitor
@@ -113,6 +120,7 @@ SC_MODULE(sc_pong_pt1_TB)
         u_Vpong_pt1 = new Vpong_pt1("u_Vpong_pt1");
         u_Vpong_pt1->clk(clk);
         u_Vpong_pt1->reset(reset);
+        u_Vpong_pt1->enable(enable);
         u_Vpong_pt1->up(up);
         u_Vpong_pt1->down(down);
         u_Vpong_pt1->p_tick(p_tick);
@@ -123,6 +131,7 @@ SC_MODULE(sc_pong_pt1_TB)
         u_pong_pt1 = new pong_pt1("u_pong_pt1");
         u_pong_pt1->clk(clk);
         u_pong_pt1->reset(reset);
+        u_pong_pt1->enable(enable);
         u_pong_pt1->up(up);
         u_pong_pt1->down(down);
         u_pong_pt1->p_tick(p_tick);
@@ -133,6 +142,7 @@ SC_MODULE(sc_pong_pt1_TB)
         u_pong_pt1 = new pong_pt1("u_pong_pt1");
         u_pong_pt1->clk(clk);
         u_pong_pt1->reset(reset);
+        u_pong_pt1->enable(enable);
         u_pong_pt1->up(up);
         u_pong_pt1->down(down);
         u_pong_pt1->hsync(hsync);
@@ -144,12 +154,15 @@ SC_MODULE(sc_pong_pt1_TB)
         fp->set_time_unit(100, SC_PS);
         sc_trace(fp, clk,   "clk");
         sc_trace(fp, reset, "reset");
+        sc_trace(fp, enable,"enable");
         sc_trace(fp, up,    "up");
         sc_trace(fp, down,  "down");
         sc_trace(fp, p_tick,"p_tick");
         sc_trace(fp, hsync, "hsync");
         sc_trace(fp, vsync, "vsync");
+#if defined(VERILATION) || defined(CO_EMULATION)
         sc_trace(fp, rgb,   "rgb");
+#endif
 #endif  // VCD_TRACE
     }
 

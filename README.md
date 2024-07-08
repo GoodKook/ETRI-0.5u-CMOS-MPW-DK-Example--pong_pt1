@@ -8,7 +8,7 @@
 Project: Verilog Pong-Game
 
 Verilog RTL
-- Parametized Table Size
+- Parametized Module (Re-Sizable Pong Table)
 - Good combinational circuit description example
 - Understanding video signal generation
 

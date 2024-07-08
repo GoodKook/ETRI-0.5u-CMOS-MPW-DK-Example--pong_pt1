@@ -84,9 +84,7 @@ for emulation
 </br>
 <img src="./emulation/_Docs_/pong_sim_vcd_2.jpg">
 </br>
-
-![Video Testbench](http://img.youtube.com/vi/https://youtu.be/L2f55Ep-HCQ/0.jpg)
-
-(http://www.youtube.com/watch?v=https://youtu.be/L2f55Ep-HCQ)
+<img src="./emulation/_Docs_/Pong_on_youtube.jpg">
+https://youtu.be/L2f55Ep-HCQ
 
 

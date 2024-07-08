@@ -95,6 +95,9 @@ Waveform
 Or
 
 </br>
+<img src="./emulation/_Docs_/pong_pt1.gif">
+
+</br>
 
 [![Video Testbench](./emulation/_Docs_/Pong_on_youtube.jpg)](https://youtu.be/L2f55Ep-HCQ)
 Click Image

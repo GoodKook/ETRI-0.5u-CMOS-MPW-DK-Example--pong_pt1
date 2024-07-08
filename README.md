@@ -87,4 +87,7 @@ for emulation
 <img src="./emulation/_Docs_/Pong_on_youtube.jpg">
 https://youtu.be/L2f55Ep-HCQ
 
+[!("./emulation/_Docs_/Pong_on_youtube.jpg")](https://youtu.be/L2f55Ep-HCQ)
+
+
 

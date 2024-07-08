@@ -1,13 +1,4 @@
 # ETRI-0.5u-CMOS-MPW-DK-Example--pong_pt1
- 
-<img src="./emulation/_Docs_/Desk_Shot.jpg">
-</br>
-<img src="./emulation/_Docs_/Pong_on_VGAX.jpg">
-</br>
-<img src="./emulation/_Docs_/pong_sim_vcd_1.jpg">
-</br>
-<img src="./emulation/_Docs_/pong_sim_vcd_2.jpg">
-
 
 Project: Verilog Pong-Game
 
@@ -85,3 +76,10 @@ for emulation
                                                           +---------------------+
 
 
+<img src="./emulation/_Docs_/Desk_Shot.jpg">
+</br>
+<img src="./emulation/_Docs_/Pong_on_VGAX.jpg">
+</br>
+<img src="./emulation/_Docs_/pong_sim_vcd_1.jpg">
+</br>
+<img src="./emulation/_Docs_/pong_sim_vcd_2.jpg">

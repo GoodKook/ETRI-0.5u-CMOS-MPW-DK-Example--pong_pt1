@@ -8,7 +8,7 @@
 Project: Verilog Pong-Game
 
 Verilog RTL
-- Parametized Table Size
+- Parametized Module (Re-Sizable Pong Table)
 - Good combinational circuit description example
 - Understanding video signal generation
 
@@ -61,23 +61,23 @@ for simulation
 
 for emulation
 - Yosys (Verilog synthesizer)
+- Arduino IDE
 - Gowin IDE
-                                                    +-------------------+
-                       +-----------------+          |     SystemC TB    |
-                       |  [PSCE-wrapper] |          |  +--------------+ |
-                       |   +-----------+ |          |  | [SC wrapper] | |
-          +---------+  |   +------+    | |          |  +--+           | |
-+-------+ |[Peri-IF]|  |+-------+ |    | | +----------+   | (DUT-IF)  | |
-| GLCD  | |         |  || Pong  | |    | | |[PSCE-API]|   |  +---------------+
-|  or   <=> Arduino <==>  (DUT) <=>    <===>          <===>  | Animated Pong |
-| VGAX  | |  MEGA   |  ||       | |    | | | Arduino  |   |  |               |
-+-------+ |         |  |+-------+ |    | | |   DUE    |   |  |   (SDL2)      |
-          +---------+  |   +------+    | | +----------+   |  +---------------+
-                       |   +-----------+ |          |   +-+            | |
-                       |  FPGA/TANG 25K  |          |   +--------------+ |
-                       +-----------------+          |   PC/Workstation   |
-                                                    +--------------------+
-
-
+  
+                                                          +--------------------+
+                             +-----------------+          |     SystemC TB     |
+                             |  [PSCE-wrapper] |          |  +--------------+  |
+                             |   +-----------+ |          |  | [SC wrapper] |  |
+                +---------+  |   +------+    | |          |  +--+           |  |
+      +-------+ |[Peri-IF]|  |+-------+ |    | | +----------+   | (DUT-IF)  |  |
+      | GLCD  | |         |  || Pong  | |    | | |[PSCE-API]|   |  +---------------+
+      |  or   <=> Arduino <==>  (DUT) <=>    <===>          <===>  | Animated Pong |
+      | VGAX  | |  MEGA   |  ||       | |    | | | Arduino  |   |  |               |
+      +-------+ |         |  |+-------+ |    | | |   DUE    |   |  |   (SDL2)      |
+                +---------+  |   +------+    | | +----------+   |  +---------------+
+                             |   +-----------+ |          |   +-+            |  |
+                             |  FPGA/TANG 25K  |          |   +--------------+  |
+                             +-----------------+          |   PC/Workstation    |
+                                                          +---------------------+
 
 

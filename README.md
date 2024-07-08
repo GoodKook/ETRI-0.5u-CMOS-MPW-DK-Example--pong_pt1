@@ -76,13 +76,16 @@ for emulation
                                                           +---------------------+
 
 </br>
-
-Waveform
-
-</br>
 <img src="./emulation/_Docs_/Desk_Shot.jpg">
 </br>
 <img src="./emulation/_Docs_/Pong_on_VGAX.jpg">
+</br>
+
+------------------------------------------------------------------------------------
+</br>
+
+Waveform
+
 </br>
 <img src="./emulation/_Docs_/pong_sim_vcd_1.jpg">
 </br>

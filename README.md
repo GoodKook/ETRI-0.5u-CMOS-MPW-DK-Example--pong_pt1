@@ -84,5 +84,4 @@ for emulation
 </br>
 <img src="./emulation/_Docs_/pong_sim_vcd_2.jpg">
 </br>
-https://youtu.be/L2f55Ep-HCQ
-[![Video Label](./emulation/_Docs_/Pong_on_youtube.jpg)](https://youtu.be/L2f55Ep-HCQ)
+[![Video](./emulation/_Docs_/Pong_on_youtube.jpg)](https://youtu.be/L2f55Ep-HCQ)
